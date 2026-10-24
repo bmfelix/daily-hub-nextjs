@@ -19,10 +19,14 @@ export default async function HomePage() {
 
       <div className="cards">
         {cards.map(({ hubModule, data }) => (
-          <Link className="card" href={`/${hubModule.slug}`} key={hubModule.slug}>
-            <h2>{hubModule.title}</h2>
+          <div className="card" key={hubModule.slug}>
+            <h2>
+              <Link className="card-link" href={`/${hubModule.slug}`}>
+                {hubModule.title}
+              </Link>
+            </h2>
             {hubModule.Card && data !== undefined ? <hubModule.Card data={data} /> : <p>{hubModule.summary}</p>}
-          </Link>
+          </div>
         ))}
       </div>
     </>

@@ -70,6 +70,8 @@ export interface Config {
     pages: Page;
     tasks: Task;
     notes: Note;
+    artists: Artist;
+    'artist-names': ArtistName;
     media: Media;
     users: User;
     'payload-kv': PayloadKv;
@@ -82,6 +84,8 @@ export interface Config {
     pages: PagesSelect<false> | PagesSelect<true>;
     tasks: TasksSelect<false> | TasksSelect<true>;
     notes: NotesSelect<false> | NotesSelect<true>;
+    artists: ArtistsSelect<false> | ArtistsSelect<true>;
+    'artist-names': ArtistNamesSelect<false> | ArtistNamesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -177,6 +181,65 @@ export interface Note {
   createdAt: string;
 }
 /**
+ * Filled automatically from MusicBrainz when an artist is first looked up.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "artists".
+ */
+export interface Artist {
+  id: number;
+  mbid: string;
+  name: string;
+  /**
+   * The full MusicBrainz artist record.
+   */
+  data:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Every album, EP, and single.
+   */
+  releaseGroups:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fetchedAt: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Radio names already looked up, including names with no match.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "artist-names".
+ */
+export interface ArtistName {
+  id: number;
+  /**
+   * The name in lowercase.
+   */
+  key: string;
+  name: string;
+  /**
+   * Empty when nothing matched.
+   */
+  artist?: (number | null) | Artist;
+  checkedAt: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
@@ -258,6 +321,14 @@ export interface PayloadLockedDocument {
         value: number | Note;
       } | null)
     | ({
+        relationTo: 'artists';
+        value: number | Artist;
+      } | null)
+    | ({
+        relationTo: 'artist-names';
+        value: number | ArtistName;
+      } | null)
+    | ({
         relationTo: 'media';
         value: number | Media;
       } | null)
@@ -337,6 +408,31 @@ export interface TasksSelect<T extends boolean = true> {
 export interface NotesSelect<T extends boolean = true> {
   title?: T;
   body?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "artists_select".
+ */
+export interface ArtistsSelect<T extends boolean = true> {
+  mbid?: T;
+  name?: T;
+  data?: T;
+  releaseGroups?: T;
+  fetchedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "artist-names_select".
+ */
+export interface ArtistNamesSelect<T extends boolean = true> {
+  key?: T;
+  name?: T;
+  artist?: T;
+  checkedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -1,6 +1,8 @@
 import Image from 'next/image'
 
-import type { RadioData } from './data'
+import Link from 'next/link'
+
+import { artistUrl, type RadioData } from './data'
 
 const playedAt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', timeStyle: 'short' })
 
@@ -28,7 +30,9 @@ export function RadioView({ data }: { data: RadioData }) {
                           {track.playing ? 'Now playing' : playedAt.format(new Date(track.start * 1000))}
                         </span>
                         <strong>{track.title}</strong>
-                        <span>{track.artist}</span>
+                        <Link className="artist-link" href={artistUrl(track.artist)} prefetch={false}>
+                    {track.artist}
+                  </Link>
                       </div>
                     </li>
                   ))

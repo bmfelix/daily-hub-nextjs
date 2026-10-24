@@ -1,6 +1,8 @@
 import Image from 'next/image'
 
-import type { RadioData } from './data'
+import Link from 'next/link'
+
+import { artistUrl, type RadioData } from './data'
 
 export function RadioCard({ data }: { data: RadioData }) {
   return (
@@ -18,7 +20,9 @@ export function RadioCard({ data }: { data: RadioData }) {
               {track ? (
                 <>
                   <strong>{track.title}</strong>
-                  <span>{track.artist}</span>
+                  <Link className="artist-link" href={artistUrl(track.artist)} prefetch={false}>
+                    {track.artist}
+                  </Link>
                 </>
               ) : (
                 <span>{station.error ?? 'No songs yet.'}</span>

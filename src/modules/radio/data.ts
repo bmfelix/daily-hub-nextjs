@@ -7,6 +7,9 @@ export type StationData = { name: string; frequency: string; tracks?: Track[]; e
 
 export type RadioData = { stations: StationData[] }
 
+/** The artist page for a name as the radio spells it. */
+export const artistUrl = (name: string) => `/artists?${new URLSearchParams({ name })}`
+
 /** Postgres NOTIFY channel the listener announces changes on. */
 export const RADIO_CHANNEL = 'radio_updates'
 
@@ -49,6 +52,7 @@ export function signature(data: RadioData): string {
  */
 export class RadioListener {
   lastSeen: string | null = null
+  lastData: RadioData | null = null
 
   constructor(
     private announce: (data: RadioData) => Promise<void>,
@@ -58,6 +62,7 @@ export class RadioListener {
   /** Announce if anything changed since the last check. Returns true when it announced. */
   async check(): Promise<boolean> {
     const data = await stationData(this.stations, 1)
+    this.lastData = data
     const seen = signature(data)
     if (seen === this.lastSeen) return false
     await this.announce(data)
@@ -65,4 +70,9 @@ export class RadioListener {
     this.lastSeen = seen
     return true
   }
+}
+
+/** The artist names on air at the last check. */
+export function currentArtists(data: RadioData | null): string[] {
+  return (data?.stations ?? []).map((station) => station.tracks?.[0]?.artist).filter((name): name is string => Boolean(name))
 }

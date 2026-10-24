@@ -31,10 +31,14 @@ services:
       context: .
       target: listener
     env_file: .env
+    environment:
+      WEB_URL: http://web:3000
     restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
+      web:
+        condition: service_started
 
 volumes:
   pgdata:

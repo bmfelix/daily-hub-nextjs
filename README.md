@@ -40,6 +40,16 @@ The Radio card on the homepage updates without a reload, using only Postgres (no
 3. Each web server process holds one `LISTEN radio_updates` connection (`src/lib/radioUpdates.ts`) and passes every message to the open browser streams.
 4. The homepage card (`LiveRadioCard`) keeps a **Server-Sent Events** connection to `/live/radio` and re-renders when a message arrives. The browser reconnects by itself if the stream drops.
 
+## Artist pages
+
+Click an artist on the homepage card or the Radio page to see everything MusicBrainz has on them: photo, origin, active years, rating, genres, members (with roles and years), the full discography with cover art, links (listen, official, social, concerts, buy, reference), aliases, related artists, and identifiers.
+
+- **Fetched once, then saved** in two Payload collections: `artists` (the full MusicBrainz record and every release) and `artist-names` (which radio name matched which artist, including names with no match). Both are visible in the admin. Saved artists are refreshed after 30 days; unmatched names are retried after 7.
+- **Fetched ahead of time.** The listener posts the artists on air to `/artists/prefetch` (protected by `PAYLOAD_SECRET`), and the website looks them up, so most clicks open instantly.
+- **Loading screen.** `src/app/(frontend)/artists/loading.tsx` shows a "please wait" overlay during navigation. It fades in after 0.25 seconds, so saved artists never flash it.
+- **Polite to MusicBrainz** (`src/lib/musicbrainz/client.ts`): every request names the app and a contact address, requests are queued at least 1.1 seconds apart, and a "slow down" reply (503) is retried once.
+- **Careful matching** (`src/lib/musicbrainz/names.ts`): a result must match the name or an alias. For "A [+] B" or "A, B & C", the full name is tried first, then the first artist.
+
 ## Run with Docker
 
 1. `cp .env.example .env`, then set `PAYLOAD_SECRET`, `POSTGRES_PASSWORD`, and the same password inside `DATABASE_URL`.
