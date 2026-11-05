@@ -4,6 +4,7 @@ import type { WeatherData } from './WeatherModule'
 export function WeatherView({ data }: { data: WeatherData }) {
   return (
     <>
+      <p className="kicker">Outside the venue</p>
       <h1>Weather</h1>
 
       <form className="inline-form" method="get">
@@ -16,7 +17,7 @@ export function WeatherView({ data }: { data: WeatherData }) {
         <p className="notice">{data.error}</p>
       ) : (
         <>
-          <section className="panel">
+          <section className="sky">
             <h2>
               {data.place.name}
               {data.place.country && `, ${data.place.country}`}
@@ -32,12 +33,15 @@ export function WeatherView({ data }: { data: WeatherData }) {
           </section>
 
           <h2>Next 5 days</h2>
-          <ul className="forecast">
+          <ul className="week">
             {data.days.map((day) => (
-              <li className="panel" key={day.date}>
-                <strong>{day.date}</strong>
+              <li key={day.date}>
+                <strong>{day.weekday}</strong>
                 <span>{day.label}</span>
-                <span>
+                <span className="range" aria-hidden="true">
+                  <span style={{ left: `${day.barStart}%`, width: `${day.barWidth}%` }} />
+                </span>
+                <span className="temps">
                   {day.low}° / {day.high}°
                 </span>
               </li>

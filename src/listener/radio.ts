@@ -25,6 +25,7 @@ const listener = new RadioListener(async (data) => {
 console.log(`Listening for song changes every ${intervalMs / 1000} seconds.`)
 
 let lastPrefetched = ''
+let syncNeeded = true
 
 /** Ask the website to look up the artists on air, so their pages open instantly. */
 async function prefetchArtists() {
@@ -41,9 +42,26 @@ async function prefetchArtists() {
   console.log('Artists ready:', JSON.stringify((await response.json()).results))
 }
 
+/** Ask the website to save recent plays and look up a few songs and artists. */
+async function sync() {
+  const response = await fetch(`${webUrl}/live/sync`, {
+    method: 'POST',
+    headers: { 'x-listener-secret': process.env.PAYLOAD_SECRET ?? '' },
+    signal: AbortSignal.timeout(120_000),
+  })
+  if (!response.ok) throw new Error(`sync returned ${response.status}`)
+  const { looked, waiting } = (await response.json()) as { looked: number; waiting: number }
+  syncNeeded = waiting > 0
+  // New previews change what the cards show, so announce again.
+  if (looked > 0) listener.lastSeen = null
+}
+
 async function tick() {
   try {
-    if (await listener.check()) console.log('Broadcast:', listener.lastSeen)
+    if (await listener.check()) {
+      console.log('Broadcast:', listener.lastSeen)
+      syncNeeded = true
+    }
   } catch (error) {
     console.error('Check failed:', error) // keep listening through any one bad check
   }
@@ -51,6 +69,11 @@ async function tick() {
     await prefetchArtists()
   } catch (error) {
     console.error('Artist prefetch failed:', error)
+  }
+  try {
+    if (syncNeeded) await sync()
+  } catch (error) {
+    console.error('Sync failed:', error)
   }
   setTimeout(tick, intervalMs)
 }

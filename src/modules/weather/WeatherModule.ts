@@ -1,5 +1,6 @@
 import { HubModule, param, type SearchParams } from '../HubModule'
 import { OpenMeteoClient, type Place } from './OpenMeteoClient'
+import { WeatherCard } from './WeatherCard'
 import { WeatherView } from './WeatherView'
 
 // WMO weather codes used by Open-Meteo, grouped into plain labels.
@@ -27,7 +28,7 @@ type WeatherResult =
       temperatureUnit: string
       windUnit: string
       current: { temperature: number; feelsLike: number; wind: number; label: string }
-      days: { date: string; label: string; high: number; low: number }[]
+      days: { date: string; weekday: string; label: string; high: number; low: number; barStart: number; barWidth: number }[]
     }
 
 export type WeatherData = WeatherResult & { locate: boolean }
@@ -44,11 +45,18 @@ function readCoordinates(params: SearchParams): Coordinates | null {
   return Math.abs(latitude) <= 90 && Math.abs(longitude) <= 180 ? { latitude, longitude } : null
 }
 
-export class WeatherModule extends HubModule<WeatherData> {
+const weekday = new Intl.DateTimeFormat('en-US', { weekday: 'short', timeZone: 'UTC' })
+
+export class WeatherModule extends HubModule<WeatherData, null> {
   readonly slug = 'weather'
   readonly title = 'Weather'
   readonly summary = 'Current conditions and a 5-day forecast for any city.'
   readonly View = WeatherView
+  readonly Card = WeatherCard
+
+  async card() {
+    return null // the card asks from the browser, which knows where the visitor is
+  }
 
   defaultCity = 'London'
 
@@ -79,6 +87,8 @@ export class WeatherModule extends HubModule<WeatherData> {
       if (coordinates) city = place.name
       const imperial = FAHRENHEIT_COUNTRIES.has(place.country_code ?? '')
       const { current, daily } = await this.client.forecast(place.latitude, place.longitude, imperial)
+      const coldest = Math.min(...daily.temperature_2m_min)
+      const spread = Math.max(...daily.temperature_2m_max) - coldest || 1
       return {
         city,
         place,
@@ -92,9 +102,13 @@ export class WeatherModule extends HubModule<WeatherData> {
         },
         days: daily.time.map((date, i) => ({
           date,
+          weekday: weekday.format(new Date(`${date}T12:00:00Z`)),
           label: label(daily.weather_code[i]),
           high: daily.temperature_2m_max[i],
           low: daily.temperature_2m_min[i],
+          // Where this day's range sits on a bar covering the whole week.
+          barStart: Math.round(((daily.temperature_2m_min[i] - coldest) / spread) * 100),
+          barWidth: Math.round(((daily.temperature_2m_max[i] - daily.temperature_2m_min[i]) / spread) * 100),
         })),
       }
     } catch {

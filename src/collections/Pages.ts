@@ -3,7 +3,7 @@ import type { CollectionConfig } from 'payload'
 import { MODULE_SLUGS } from '@/modules/slugs'
 
 // Addresses the site already uses: the admin, the API, live updates, artist pages, and every module.
-const RESERVED_SLUGS: string[] = ['admin', 'api', 'live', 'artists', ...MODULE_SLUGS]
+const RESERVED_SLUGS: string[] = ['admin', 'api', 'live', 'artists', 'songs', 'spotify', ...MODULE_SLUGS]
 
 /** Editable content pages, like WordPress pages. Published pages are public at /<slug>. */
 export const Pages: CollectionConfig = {

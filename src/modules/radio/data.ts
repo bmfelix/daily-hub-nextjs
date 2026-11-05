@@ -3,7 +3,9 @@
 
 import { IHeartStation, type Station, type Track, TritonStation } from './stations'
 
-export type StationData = { name: string; frequency: string; tracks?: Track[]; error?: string }
+export type { TrackSong } from './stations'
+
+export type StationData = { name: string; frequency: string; streamUrl: string; tracks?: Track[]; error?: string }
 
 export type RadioData = { stations: StationData[] }
 
@@ -25,11 +27,11 @@ export async function stationData(stations: Station[], limit: number): Promise<R
   return {
     stations: await Promise.all(
       stations.map(async (station) => {
-        const { name, frequency } = station
+        const { name, frequency, streamUrl } = station
         try {
-          return { name, frequency, tracks: await station.recent(limit) }
+          return { name, frequency, streamUrl, tracks: await station.recent(limit) }
         } catch {
-          return { name, frequency, error: UNAVAILABLE }
+          return { name, frequency, streamUrl, error: UNAVAILABLE }
         }
       }),
     ),

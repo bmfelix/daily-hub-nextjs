@@ -105,7 +105,7 @@ describe('CMS pages', () => {
   it('shows published pages to visitors and hides drafts', async () => {
     await payload.create({
       collection: 'pages',
-      data: { title: 'About', slug: 'about', showInMenu: true, _status: 'published' },
+      data: { title: 'Team', slug: 'team', showInMenu: true, _status: 'published' },
     })
     await payload.create({
       collection: 'pages',
@@ -113,9 +113,9 @@ describe('CMS pages', () => {
       draft: true,
     })
 
-    expect((await getPublishedPage('about'))?.title).toBe('About')
+    expect((await getPublishedPage('team'))?.title).toBe('Team')
     expect(await getPublishedPage('secret')).toBeNull()
-    expect((await getMenuPages()).map((page) => page.slug)).toEqual(['about'])
+    expect((await getMenuPages()).map((page) => page.slug)).toEqual(['team'])
   })
 
   it('rejects slugs used by modules', async () => {

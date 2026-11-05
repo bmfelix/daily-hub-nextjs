@@ -15,5 +15,11 @@ export const Artists: CollectionConfig = {
     { name: 'data', type: 'json', required: true, admin: { description: 'The full MusicBrainz artist record.' } },
     { name: 'releaseGroups', type: 'json', required: true, admin: { description: 'Every album, EP, and single.' } },
     { name: 'fetchedAt', type: 'date', required: true, admin: { date: { pickerAppearance: 'dayAndTime' } } },
+    { name: 'wikipediaTitle', type: 'text' },
+    { name: 'wikipediaUrl', type: 'text' },
+    { name: 'wikipediaSummary', type: 'textarea' },
+    { name: 'wikipediaImage', type: 'text' },
+    { name: 'appleAlbums', type: 'json', admin: { description: 'Apple artwork, used when the Cover Art Archive has no cover.' } },
+    { name: 'extrasCheckedAt', type: 'date', admin: { date: { pickerAppearance: 'dayAndTime' } } },
   ],
 }

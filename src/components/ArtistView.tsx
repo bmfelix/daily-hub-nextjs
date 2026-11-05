@@ -1,8 +1,10 @@
 import Link from 'next/link'
 
 import type { ArtistProfile, Person } from '@/lib/musicbrainz/profile'
+import type { TrackSong } from '@/modules/radio/data'
 
 import { HideOnError } from './HideOnError'
+import { SongPlayer } from './SongPlayer'
 
 const savedOn = new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium' })
 
@@ -31,10 +33,13 @@ function People({ people, details = true }: { people: Person[]; details?: boolea
   )
 }
 
-export function ArtistView({ artist }: { artist: ArtistProfile }) {
+type SavedSong = TrackSong & { album: string }
+
+export function ArtistView({ artist, songs = [] }: { artist: ArtistProfile; songs?: SavedSong[] }) {
   return (
     <article className="artist">
       <header className="artist-hero">
+        {artist.image && <HideOnError className="artist-backdrop" src={artist.image} alt="" aria-hidden="true" />}
         <div className="artist-photo">
           {artist.image && <HideOnError src={artist.image} alt={artist.name} width={320} height={320} />}
           <span className="artist-monogram" aria-hidden="true">
@@ -106,6 +111,52 @@ export function ArtistView({ artist }: { artist: ArtistProfile }) {
         </div>
       </header>
 
+      {artist.wikipedia && (
+        <section className="artist-section">
+          <h2>About</h2>
+          <div className="artist-about">
+            <p>{artist.wikipedia.lead}</p>
+            {artist.wikipedia.rest.length > 0 && (
+              <details>
+                <summary>Read more</summary>
+                {artist.wikipedia.rest.map((line) => (
+                  <p key={line}>{line}</p>
+                ))}
+              </details>
+            )}
+          </div>
+          <p className="meta">
+            From{' '}
+            <a href={artist.wikipedia.url} rel="noopener" target="_blank">
+              {artist.wikipedia.title} on Wikipedia
+            </a>
+            , under{' '}
+            <a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="noopener" target="_blank">
+              CC BY-SA 4.0
+            </a>
+            .
+          </p>
+        </section>
+      )}
+
+      {songs.length > 0 && (
+        <section className="artist-section">
+          <h2>Heard on the radio</h2>
+          <ul className="songs">
+            {songs.map((song) => (
+              <li key={song.id}>
+                <span className="art">{song.artworkUrl && <HideOnError src={song.artworkUrl} alt="" width={64} height={64} loading="lazy" />}</span>
+                <div className="track-text">
+                  <strong>{song.title}</strong>
+                  {song.album && <span className="meta">{song.album}</span>}
+                </div>
+                <SongPlayer song={song} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {artist.members.length > 0 && (
         <section className="artist-section">
           <h2>Members</h2>
@@ -132,15 +183,22 @@ export function ArtistView({ artist }: { artist: ArtistProfile }) {
                 {section.releases.map((release) => (
                   <li key={release.mbid}>
                     <a href={`https://musicbrainz.org/release-group/${release.mbid}`} rel="noopener" target="_blank">
-                      <span className="cover">
-                        <HideOnError src={release.cover} alt="" width={250} height={250} loading="lazy" />
-                        <span className="cover-fallback" aria-hidden="true">
-                          ♪
+                      <span className="cover-sleeve">
+                        <span className="cover">
+                          <HideOnError src={release.cover} fallback={release.appleArtwork} alt="" width={250} height={250} loading="lazy" />
+                          <span className="cover-fallback" aria-hidden="true">
+                            ♪
+                          </span>
                         </span>
                       </span>
                       <strong>{release.title}</strong>
                       <span className="meta">{release.year || 'Year unknown'}</span>
                     </a>
+                    {release.appleUrl && (
+                      <a className="meta cover-source" href={release.appleUrl} rel="noopener" target="_blank">
+                        Apple Music
+                      </a>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -240,7 +298,7 @@ export function ArtistView({ artist }: { artist: ArtistProfile }) {
 
       <p className="source">
         Data from MusicBrainz, saved {savedOn.format(new Date(artist.fetchedAt))}. Photo from Wikimedia Commons, covers
-        from the Cover Art Archive.
+        from the Cover Art Archive and Apple Music.
       </p>
     </article>
   )

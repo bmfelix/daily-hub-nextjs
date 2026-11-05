@@ -25,7 +25,10 @@ export class MusicBrainzClient {
   private static lastRequest = 0
 
   searchArtists(name: string, limit = 5): Promise<SearchResult[]> {
-    return this.get<{ artists: SearchResult[] }>('artist/', { query: `artist:"${name}"`, limit: String(limit) }).then(
+    // "artist" only searches the main name, so "alias" is needed for names like "Matchbox 20".
+    const quoted = name.replaceAll('\\', '\\\\').replaceAll('"', '\\"')
+    const query = `artist:"${quoted}" OR alias:"${quoted}"`
+    return this.get<{ artists: SearchResult[] }>('artist/', { query, limit: String(limit) }).then(
       (data) => data.artists,
     )
   }

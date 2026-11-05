@@ -2,6 +2,8 @@ import type { Payload } from 'payload'
 
 import type { Artist } from '@/payload-types'
 
+import { MusicClient } from '../music/client'
+import { WikipediaClient } from '../wikipedia'
 import { MusicBrainzClient } from './client'
 import { nameCandidates, nameKey, normalize } from './names'
 
@@ -10,6 +12,8 @@ const REFRESH_AFTER = 30 * DAY // saved artist details
 const RETRY_UNMATCHED_AFTER = 7 * DAY // names that matched no artist
 
 type Client = Pick<MusicBrainzClient, 'searchArtists' | 'artist' | 'releaseGroups'>
+type Wikipedia = Pick<WikipediaClient, 'find'>
+type Music = Pick<MusicClient, 'appleAlbums'>
 
 const age = (date: string) => Date.now() - new Date(date).getTime()
 
@@ -18,6 +22,8 @@ export class ArtistLibrary {
   constructor(
     private payload: Payload,
     private client: Client = new MusicBrainzClient(),
+    private wikipedia: Wikipedia = new WikipediaClient(),
+    private music: Music = new MusicClient(),
   ) {}
 
   /** The saved artist for this name, fetching it the first time. Null if nothing matches. */
@@ -25,11 +31,9 @@ export class ArtistLibrary {
     const key = nameKey(name)
     const { docs } = await this.payload.find({ collection: 'artist-names', where: { key: { equals: key } }, limit: 1, depth: 1 })
     const entry = docs[0]
-    if (entry) {
-      const artist = entry.artist as Artist | null | undefined
-      if (artist && age(artist.fetchedAt) < REFRESH_AFTER) return artist
-      if (!artist && age(entry.checkedAt) < RETRY_UNMATCHED_AFTER) return null
-    }
+    const linked = entry?.artist as Artist | null | undefined
+    if (linked) return this.save(linked.mbid)
+    if (entry && age(entry.checkedAt) < RETRY_UNMATCHED_AFTER) return null
 
     const mbid = await this.match(name)
     const artist = mbid ? await this.save(mbid) : null
@@ -61,13 +65,52 @@ export class ArtistLibrary {
   /** Fetch and save one artist, unless the saved copy is still fresh. */
   async save(mbid: string): Promise<Artist> {
     const existing = await this.saved(mbid)
-    if (existing && age(existing.fetchedAt) < REFRESH_AFTER) return existing
+    if (existing && age(existing.fetchedAt) < REFRESH_AFTER) {
+      return existing.extrasCheckedAt ? existing : this.addExtras(existing)
+    }
 
     const record = await this.client.artist(mbid)
     const releaseGroups = await this.client.releaseGroups(mbid)
-    const data = { mbid, name: record.name, data: record, releaseGroups, fetchedAt: new Date().toISOString() }
+    const data = {
+      mbid,
+      name: record.name,
+      data: record,
+      releaseGroups,
+      fetchedAt: new Date().toISOString(),
+      ...(await this.extras(record)),
+    }
     return existing
       ? this.payload.update({ collection: 'artists', id: existing.id, data })
       : this.payload.create({ collection: 'artists', data })
+  }
+
+  /** Wikipedia text and Apple artwork. If either service fails, they are tried again later. */
+  private async extras(record: Parameters<Wikipedia['find']>[0]) {
+    try {
+      const page = await this.wikipedia.find(record)
+      return {
+        wikipediaTitle: page?.title ?? '',
+        wikipediaUrl: page?.url ?? '',
+        wikipediaSummary: page?.summary ?? '',
+        wikipediaImage: page?.image ?? '',
+        appleAlbums: await this.music.appleAlbums(record.name),
+        extrasCheckedAt: new Date().toISOString(),
+      }
+    } catch {
+      return {}
+    }
+  }
+
+  /** Fill in the extras for an artist saved before they existed. */
+  async addExtras(artist: Artist): Promise<Artist> {
+    const data = await this.extras(artist.data as unknown as Parameters<Wikipedia['find']>[0])
+    return this.payload.update({ collection: 'artists', id: artist.id, data })
+  }
+
+  /** Fill in a few saved artists. Returns how many are still waiting afterwards. */
+  async fillMissing(limit: number): Promise<number> {
+    const { docs, totalDocs } = await this.payload.find({ collection: 'artists', where: { extrasCheckedAt: { exists: false } }, limit })
+    for (const artist of docs) await this.addExtras(artist)
+    return Math.max(0, totalDocs - docs.length)
   }
 }

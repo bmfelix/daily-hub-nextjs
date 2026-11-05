@@ -72,6 +72,9 @@ export interface Config {
     notes: Note;
     artists: Artist;
     'artist-names': ArtistName;
+    songs: Song;
+    plays: Play;
+    'spotify-accounts': SpotifyAccount;
     media: Media;
     users: User;
     'payload-kv': PayloadKv;
@@ -86,6 +89,9 @@ export interface Config {
     notes: NotesSelect<false> | NotesSelect<true>;
     artists: ArtistsSelect<false> | ArtistsSelect<true>;
     'artist-names': ArtistNamesSelect<false> | ArtistNamesSelect<true>;
+    songs: SongsSelect<false> | SongsSelect<true>;
+    plays: PlaysSelect<false> | PlaysSelect<true>;
+    'spotify-accounts': SpotifyAccountsSelect<false> | SpotifyAccountsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -215,6 +221,23 @@ export interface Artist {
     | boolean
     | null;
   fetchedAt: string;
+  wikipediaTitle?: string | null;
+  wikipediaUrl?: string | null;
+  wikipediaSummary?: string | null;
+  wikipediaImage?: string | null;
+  /**
+   * Apple artwork, used when the Cover Art Archive has no cover.
+   */
+  appleAlbums?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  extrasCheckedAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -236,6 +259,52 @@ export interface ArtistName {
    */
   artist?: (number | null) | Artist;
   checkedAt: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "songs".
+ */
+export interface Song {
+  id: number;
+  key: string;
+  title: string;
+  artistName: string;
+  artist?: (number | null) | Artist;
+  album?: string | null;
+  artworkUrl?: string | null;
+  applePreviewUrl?: string | null;
+  appleUrl?: string | null;
+  deezerTrackId?: number | null;
+  deezerUrl?: string | null;
+  checkedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "plays".
+ */
+export interface Play {
+  id: number;
+  station: string;
+  artistName: string;
+  title: string;
+  songKey: string;
+  playedAt: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "spotify-accounts".
+ */
+export interface SpotifyAccount {
+  id: number;
+  accessToken: string;
+  refreshToken: string;
+  expiresAt: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -327,6 +396,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'artist-names';
         value: number | ArtistName;
+      } | null)
+    | ({
+        relationTo: 'songs';
+        value: number | Song;
+      } | null)
+    | ({
+        relationTo: 'plays';
+        value: number | Play;
+      } | null)
+    | ({
+        relationTo: 'spotify-accounts';
+        value: number | SpotifyAccount;
       } | null)
     | ({
         relationTo: 'media';
@@ -421,6 +502,12 @@ export interface ArtistsSelect<T extends boolean = true> {
   data?: T;
   releaseGroups?: T;
   fetchedAt?: T;
+  wikipediaTitle?: T;
+  wikipediaUrl?: T;
+  wikipediaSummary?: T;
+  wikipediaImage?: T;
+  appleAlbums?: T;
+  extrasCheckedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -433,6 +520,49 @@ export interface ArtistNamesSelect<T extends boolean = true> {
   name?: T;
   artist?: T;
   checkedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "songs_select".
+ */
+export interface SongsSelect<T extends boolean = true> {
+  key?: T;
+  title?: T;
+  artistName?: T;
+  artist?: T;
+  album?: T;
+  artworkUrl?: T;
+  applePreviewUrl?: T;
+  appleUrl?: T;
+  deezerTrackId?: T;
+  deezerUrl?: T;
+  checkedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "plays_select".
+ */
+export interface PlaysSelect<T extends boolean = true> {
+  station?: T;
+  artistName?: T;
+  title?: T;
+  songKey?: T;
+  playedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "spotify-accounts_select".
+ */
+export interface SpotifyAccountsSelect<T extends boolean = true> {
+  accessToken?: T;
+  refreshToken?: T;
+  expiresAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -15,6 +15,9 @@ export abstract class HubModule<Data = unknown, CardData = undefined> {
   abstract readonly summary: string
   abstract readonly View: ComponentType<{ data: Data }>
 
+  readonly inMenu: boolean = true
+  readonly onHome: boolean = true
+
   /** Optional homepage card. Without one, the card shows the summary. */
   readonly Card?: ComponentType<{ data: CardData }>
 

@@ -2,15 +2,24 @@ import { getPayloadClient } from '@/lib/payload'
 import type { Task } from '@/payload-types'
 
 import { HubModule, param, type SearchParams } from '../HubModule'
+import { TodoCard } from './TodoCard'
 import { TodoView } from './TodoView'
 
 export type TodoData = { tasks: Task[]; error?: string }
+export type TodoCardData = { open: Task[]; count: number }
 
-export class TodoModule extends HubModule<TodoData> {
+export class TodoModule extends HubModule<TodoData, TodoCardData> {
   readonly slug = 'todo'
   readonly title = 'To-do'
   readonly summary = 'A simple task list saved in the database.'
   readonly View = TodoView
+  readonly Card = TodoCard
+
+  async card(): Promise<TodoCardData> {
+    const payload = await getPayloadClient()
+    const { docs, totalDocs } = await payload.find({ collection: 'tasks', where: { done: { not_equals: true } }, sort: '-createdAt', limit: 4 })
+    return { open: docs, count: totalDocs }
+  }
 
   async load(params: SearchParams): Promise<TodoData> {
     const payload = await getPayloadClient()

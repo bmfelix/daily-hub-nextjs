@@ -11,6 +11,9 @@ import { Artists } from './collections/Artists'
 import { Media } from './collections/Media'
 import { Notes } from './collections/Notes'
 import { Pages } from './collections/Pages'
+import { Plays } from './collections/Plays'
+import { Songs } from './collections/Songs'
+import { SpotifyAccounts } from './collections/SpotifyAccounts'
 import { Tasks } from './collections/Tasks'
 import { migrations } from './migrations'
 
@@ -24,7 +27,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Pages, Tasks, Notes, Artists, ArtistNames, Media, Users],
+  collections: [Pages, Tasks, Notes, Artists, ArtistNames, Songs, Plays, SpotifyAccounts, Media, Users],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

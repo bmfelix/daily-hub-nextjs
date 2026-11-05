@@ -4,6 +4,7 @@ import type { TodoData } from './TodoModule'
 export function TodoView({ data }: { data: TodoData }) {
   return (
     <>
+      <p className="kicker">The set list</p>
       <h1>To-do</h1>
 
       <form className="inline-form" action={addTask}>

@@ -16,6 +16,9 @@ function fakeFetch(body: string | object) {
   vi.stubGlobal('fetch', vi.fn(async () => new Response(text, { status: 200 })))
 }
 
+// Saved songs live in the database, so these tests leave them out and never connect to one.
+vi.mock('@/modules/radio/songs', () => ({ withSavedSongs: async (data: unknown) => data }))
+
 afterEach(() => vi.unstubAllGlobals())
 
 class FakeStation extends Station {
@@ -26,6 +29,8 @@ class FakeStation extends Station {
   ) {
     super(name, '1 FM')
   }
+
+  streamUrl = 'https://stream.test/live'
 
   protected async tracks(limit: number) {
     if (this.fail) throw new Error('down')
@@ -75,7 +80,12 @@ describe('RadioModule', () => {
   it('gives the card one song per station and reports a failed station', async () => {
     const data = await radio.card()
     expect(data.stations[0].tracks?.map((track) => track.title)).toEqual(['Self Esteem'])
-    expect(data.stations[1]).toEqual({ name: 'WKRQ', frequency: '1 FM', error: 'Song information is not available right now.' })
+    expect(data.stations[1]).toEqual({
+      name: 'WKRQ',
+      frequency: '1 FM',
+      streamUrl: 'https://stream.test/live',
+      error: 'Song information is not available right now.',
+    })
   })
 
   it('gives the page the recent songs', async () => {

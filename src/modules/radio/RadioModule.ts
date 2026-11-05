@@ -2,6 +2,7 @@ import { HubModule } from '../HubModule'
 import { defaultStations, type RadioData, stationData } from './data'
 import { LiveRadioCard } from './LiveRadioCard'
 import { RadioView } from './RadioView'
+import { withSavedSongs } from './songs'
 import type { Station } from './stations'
 
 export type { RadioData, StationData } from './data'
@@ -17,11 +18,11 @@ export class RadioModule extends HubModule<RadioData, RadioData> {
     super()
   }
 
-  load() {
-    return stationData(this.stations, 10)
+  async load() {
+    return withSavedSongs(await stationData(this.stations, 10))
   }
 
-  card() {
-    return stationData(this.stations, 1)
+  async card() {
+    return withSavedSongs(await stationData(this.stations, 1))
   }
 }
