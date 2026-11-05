@@ -1,3 +1,4 @@
+import { LocateVisitor } from './LocateVisitor'
 import type { WeatherData } from './WeatherModule'
 
 export function WeatherView({ data }: { data: WeatherData }) {
@@ -20,9 +21,13 @@ export function WeatherView({ data }: { data: WeatherData }) {
               {data.place.name}
               {data.place.country && `, ${data.place.country}`}
             </h2>
-            <p className="big">{data.current.temperature}°C</p>
+            <p className="big">
+              {data.current.temperature}
+              {data.temperatureUnit}
+            </p>
             <p>
-              {data.current.label} · Feels like {data.current.feelsLike}°C · Wind {data.current.wind} km/h
+              {data.current.label} · Feels like {data.current.feelsLike}
+              {data.temperatureUnit} · Wind {data.current.wind} {data.windUnit}
             </p>
           </section>
 
@@ -41,7 +46,9 @@ export function WeatherView({ data }: { data: WeatherData }) {
         </>
       )}
 
-      <p className="source">Data: Open-Meteo</p>
+      <p className="source">Data: Open-Meteo · Place names: OpenStreetMap</p>
+
+      {data.locate && <LocateVisitor />}
     </>
   )
 }

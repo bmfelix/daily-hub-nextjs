@@ -14,9 +14,22 @@ const down = () => Promise.reject(new Error('down'))
 
 const weatherClient = fake<OpenMeteoClient>({
   findPlace: async (name) =>
-    name === 'Nowhere' ? null : { name, country: 'France', latitude: 48.85, longitude: 2.35 },
-  forecast: async () => ({
-    current: { temperature_2m: 9.2, apparent_temperature: 7, wind_speed_10m: 12, weather_code: 3 },
+    name === 'Nowhere'
+      ? null
+      : name === 'Chicago'
+        ? { name, country: 'United States', country_code: 'US', latitude: 41.85, longitude: -87.65 }
+        : { name, country: 'France', country_code: 'FR', latitude: 48.85, longitude: 2.35 },
+  placeAt: async (latitude, longitude) =>
+    latitude === 0
+      ? null
+      : { name: 'Chicago', country: 'United States', country_code: 'US', latitude, longitude },
+  forecast: async (_latitude, _longitude, imperial) => ({
+    current: {
+      temperature_2m: imperial ? 48.6 : 9.2,
+      apparent_temperature: 7,
+      wind_speed_10m: imperial ? 7.5 : 12,
+      weather_code: 3,
+    },
     daily: {
       time: ['2026-10-24', '2026-10-25'],
       weather_code: [0, 61],
@@ -32,7 +45,42 @@ describe('WeatherModule', () => {
     if ('error' in data) throw new Error(data.error)
     expect(data.place.name).toBe('Paris')
     expect(data.current).toEqual({ temperature: 9.2, feelsLike: 7, wind: 12, label: 'Overcast' })
+    expect(data).toMatchObject({ temperatureUnit: '°C', windUnit: 'km/h' })
     expect(data.days.map((day) => day.label)).toEqual(['Clear sky', 'Light rain'])
+  })
+
+  it('uses Fahrenheit and mph in the United States', async () => {
+    const data = await new WeatherModule(weatherClient).load({ city: 'Chicago' })
+    if ('error' in data) throw new Error(data.error)
+    expect(data.current).toMatchObject({ temperature: 48.6, wind: 7.5 })
+    expect(data).toMatchObject({ temperatureUnit: '°F', windUnit: 'mph' })
+  })
+
+  it('uses the visitor\'s location', async () => {
+    const data = await new WeatherModule(weatherClient).load({ lat: '41.85', lon: '-87.65' })
+    if ('error' in data) throw new Error(data.error)
+    expect(data).toMatchObject({ city: 'Chicago', locate: false, temperatureUnit: '°F' })
+    expect(data.place.name).toBe('Chicago')
+  })
+
+  it('prefers a searched city over the visitor\'s location', async () => {
+    const data = await new WeatherModule(weatherClient).load({ city: 'Paris', lat: '41.85', lon: '-87.65' })
+    expect(data).toMatchObject({ city: 'Paris', locate: false })
+  })
+
+  it('uses the default city for invalid coordinates', async () => {
+    const data = await new WeatherModule(weatherClient).load({ lat: 'north', lon: '999' })
+    expect(data).toMatchObject({ city: 'London', locate: true })
+  })
+
+  it('reports when no place is found at the visitor\'s location', async () => {
+    const data = await new WeatherModule(weatherClient).load({ lat: '0', lon: '-30' })
+    expect(data).toMatchObject({ error: expect.stringContaining('No town found') })
+  })
+
+  it('asks for a location only when no city is chosen', async () => {
+    expect(await new WeatherModule(weatherClient).load({})).toMatchObject({ locate: true })
+    expect(await new WeatherModule(weatherClient).load({ city: 'Paris' })).toMatchObject({ locate: false })
   })
 
   it('uses the default city when none is given', async () => {
