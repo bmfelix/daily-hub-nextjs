@@ -18,5 +18,11 @@ export function nameCandidates(name: string): string[] {
   return first === '' || first === full ? [full] : [full, first]
 }
 
+/** Like normalize, and ignores spaces too, so "3AM" and "3 AM" are the same. */
+export const compact = (name: string) => normalize(name).replaceAll(' ', '')
+
+/** The same song however a station spells it. */
+export const songKey = (artist: string, title: string) => `${compact(artist)}|${compact(title)}`.slice(0, 400)
+
 /** The key a radio name is saved under. */
 export const nameKey = (name: string) => name.trim().toLowerCase()

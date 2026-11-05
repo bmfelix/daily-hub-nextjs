@@ -2,6 +2,17 @@ const IHEART_HISTORY_URL = 'https://us.api.iheart.com/api/v3/live-meta/stream'
 const TRITON_NOW_PLAYING_URL = 'https://np.tritondigital.com/public/nowplaying'
 const TIMEOUT = 5000
 
+/** What the cards need from a saved song. */
+export type TrackSong = {
+  id: number
+  hasPreview: boolean
+  artworkUrl: string
+  appleUrl: string
+  deezerUrl: string
+  title: string
+  artistName: string
+}
+
 export type Track = {
   title: string
   artist: string
@@ -10,6 +21,7 @@ export type Track = {
   start: number
   end: number
   playing: boolean
+  song?: TrackSong | null
 }
 
 async function get(url: string) {
@@ -24,6 +36,9 @@ export abstract class Station {
     readonly name: string,
     readonly frequency: string,
   ) {}
+
+  /** The station's live audio. */
+  abstract readonly streamUrl: string
 
   /** Recent songs, newest first. Each subclass calls its own API here. */
   protected abstract tracks(limit: number): Promise<Omit<Track, 'playing'>[]>
@@ -43,6 +58,10 @@ export class IHeartStation extends Station {
     super(name, frequency)
   }
 
+  get streamUrl() {
+    return `https://stream.revma.ihrhls.com/zc${this.stationId}`
+  }
+
   protected async tracks(limit: number) {
     const response = await get(`${IHEART_HISTORY_URL}/${this.stationId}/trackHistory?limit=${limit}`)
     const { data } = (await response.json()) as { data: IHeartItem[] }
@@ -60,6 +79,10 @@ export class IHeartStation extends Station {
 export class TritonStation extends Station {
   constructor(name: string, frequency: string, private mount: string) {
     super(name, frequency)
+  }
+
+  get streamUrl() {
+    return `https://playerservices.streamtheworld.com/api/livestream-redirect/${this.mount}.mp3`
   }
 
   protected async tracks(limit: number) {

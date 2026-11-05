@@ -7,6 +7,7 @@ import { MusicBrainzError } from '@/lib/musicbrainz/client'
 import { ArtistLibrary } from '@/lib/musicbrainz/library'
 import { artistProfile } from '@/lib/musicbrainz/profile'
 import { getPayloadClient } from '@/lib/payload'
+import { trackSong } from '@/modules/radio/songs'
 
 export const dynamic = 'force-dynamic'
 
@@ -36,5 +37,8 @@ export default async function ArtistPage({ params }: Props) {
     if (error instanceof MusicBrainzError && [400, 404].includes(error.status)) notFound()
     return <ArtistMissing message="MusicBrainz did not respond. Try again shortly." />
   }
-  return <ArtistView artist={artistProfile(artist)} />
+  const payload = await getPayloadClient()
+  const { docs } = await payload.find({ collection: 'songs', where: { artist: { equals: artist.id } }, sort: 'title', pagination: false, depth: 0 })
+  const songs = docs.map((song) => ({ ...trackSong(song), album: song.album ?? '' }))
+  return <ArtistView artist={artistProfile(artist)} songs={songs} />
 }

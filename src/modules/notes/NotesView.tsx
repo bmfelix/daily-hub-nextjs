@@ -10,6 +10,7 @@ export function NotesView({ data }: { data: NotesData }) {
 
   return (
     <>
+      <p className="kicker">Liner notes</p>
       <h1>Notes</h1>
 
       <div className="split">

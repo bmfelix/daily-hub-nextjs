@@ -2,6 +2,7 @@
 
 import type { Artist } from '@/payload-types'
 
+import { type AppleAlbums, albumKey } from '../music/client'
 import type { ReleaseGroup } from './client'
 
 type Named = { name: string }
@@ -35,7 +36,7 @@ type Record_ = {
 
 export type Link = { url: string; label: string; kind: string }
 export type Person = { name: string; mbid: string; years: string; roles: string[]; original: boolean; current: boolean }
-export type Release = { title: string; year: string; mbid: string; cover: string }
+export type Release = { title: string; year: string; mbid: string; cover: string; appleArtwork: string; appleUrl: string }
 
 const LINK_GROUPS: [string, Set<string>][] = [
   ['Listen', new Set(['free streaming', 'streaming', 'youtube music', 'soundcloud', 'bandcamp'])],
@@ -106,7 +107,15 @@ function mergePerson(people: Person[], person: Person) {
   existing.current ||= person.current
 }
 
+/** The first paragraph to show straight away, and the rest behind "Read more". */
+function wikipediaSection(artist: Artist) {
+  const [lead, ...rest] = (artist.wikipediaSummary ?? '').trim().split('\n')
+  if (!lead) return null
+  return { title: artist.wikipediaTitle ?? '', url: artist.wikipediaUrl ?? '', lead, rest: rest.filter((line) => line.trim()) }
+}
+
 export function artistProfile(artist: Artist) {
+  const appleAlbums = (artist.appleAlbums ?? {}) as AppleAlbums
   const data = artist.data as unknown as Record_
   const life = data['life-span'] ?? {}
 
@@ -153,6 +162,8 @@ export function artistProfile(artist: Artist) {
       year: year(group['first-release-date']),
       mbid: group.id,
       cover: `https://coverartarchive.org/release-group/${group.id}/front-250`,
+      appleArtwork: appleAlbums[albumKey(group.title)]?.artwork ?? '',
+      appleUrl: appleAlbums[albumKey(group.title)]?.url ?? '',
     })
   }
   const discography = [...sections]
@@ -180,7 +191,8 @@ export function artistProfile(artist: Artist) {
     genres,
     tags: tags.slice(0, 12),
     aliases: [...new Set((data.aliases ?? []).map((a) => a.name).filter((n) => n !== data.name))].sort(),
-    image,
+    image: image ?? (artist.wikipediaImage || null),
+    wikipedia: wikipediaSection(artist),
     members: members.sort((a, b) => Number(!a.current) - Number(!b.current) || a.years.localeCompare(b.years)),
     memberOf,
     related,

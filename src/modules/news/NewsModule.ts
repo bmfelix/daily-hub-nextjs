@@ -1,5 +1,6 @@
 import { HubModule } from '../HubModule'
 import { HackerNewsClient } from './HackerNewsClient'
+import { NewsCard } from './NewsCard'
 import { NewsView } from './NewsView'
 
 export type Story = {
@@ -14,11 +15,12 @@ export type Story = {
 
 export type NewsData = { error: string } | { stories: Story[] }
 
-export class NewsModule extends HubModule<NewsData> {
+export class NewsModule extends HubModule<NewsData, NewsData> {
   readonly slug = 'news'
   readonly title = 'News'
   readonly summary = 'Top headlines from the Hacker News front page.'
   readonly View = NewsView
+  readonly Card = NewsCard
 
   constructor(private client = new HackerNewsClient()) {
     super()
@@ -44,5 +46,9 @@ export class NewsModule extends HubModule<NewsData> {
     } catch {
       return { error: 'The news service did not respond. Try again shortly.' }
     }
+  }
+
+  card() {
+    return this.load()
   }
 }

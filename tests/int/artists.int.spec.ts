@@ -21,7 +21,7 @@ beforeEach(async () => {
   await payload.delete({ collection: 'artist-names', where: { id: { exists: true } } })
   await payload.delete({ collection: 'artists', where: { id: { exists: true } } })
   fake = new FakeMusicBrainz()
-  library = new ArtistLibrary(payload, fake)
+  library = new ArtistLibrary(payload, fake, { find: async () => null }, { appleAlbums: async () => ({}) })
 })
 
 const kinds = () => fake.calls.map(([kind]) => kind)

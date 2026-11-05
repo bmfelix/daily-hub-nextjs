@@ -3,15 +3,16 @@ import type { NewsData } from './NewsModule'
 export function NewsView({ data }: { data: NewsData }) {
   return (
     <>
+      <p className="kicker">Today&apos;s headliners</p>
       <h1>News</h1>
 
       {'error' in data ? (
         <p className="notice">{data.error}</p>
       ) : (
-        <ol className="list">
+        <ol className="headlines">
           {data.stories.map((story) => (
-            <li className="panel" key={story.id}>
-              <a href={story.url} rel="noopener" target="_blank">
+            <li key={story.id}>
+              <a className="headline" href={story.url} rel="noopener" target="_blank">
                 {story.title}
               </a>
               <span className="meta">
