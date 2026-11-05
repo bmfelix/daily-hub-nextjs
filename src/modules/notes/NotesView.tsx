@@ -1,6 +1,5 @@
 import Link from 'next/link'
 
-import { deleteNote, saveNote } from './actions'
 import type { NotesData } from './NotesModule'
 
 const updated = new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium', timeStyle: 'short' })
@@ -15,9 +14,6 @@ export function NotesView({ data }: { data: NotesData }) {
 
       <div className="split">
         <aside>
-          <p>
-            <Link href="/notes">+ New note</Link>
-          </p>
           <ul className="list">
             {data.notes.length ? (
               data.notes.map((item) => (
@@ -33,30 +29,16 @@ export function NotesView({ data }: { data: NotesData }) {
         </aside>
 
         <section className="panel">
-          <h2>{note ? 'Edit note' : 'New note'}</h2>
-          {data.error && <p className="notice">{data.error}</p>}
-          {/* key resets the form fields when switching notes */}
-          <form className="stack-form" action={saveNote} key={note?.id ?? 'new'}>
-            {note && <input type="hidden" name="note" value={note.id} />}
-            <div>
-              <label htmlFor="note-title">Title</label>
-              <input id="note-title" name="title" defaultValue={note?.title ?? ''} maxLength={200} required />
-            </div>
-            <div>
-              <label htmlFor="note-body">Body</label>
-              <textarea id="note-body" name="body" rows={8} defaultValue={note?.body ?? ''} />
-            </div>
-            <div className="actions">
-              <button type="submit" name="action" value="save">
-                Save
-              </button>
-              {note && (
-                <button className="link-button" type="submit" formAction={deleteNote} formNoValidate>
-                  Delete
-                </button>
-              )}
-            </div>
-          </form>
+          {note ? (
+            <>
+              <h2>{note.title}</h2>
+              {(note.body ?? '').split('\n').map((line, i) => (
+                <p key={i}>{line}</p>
+              ))}
+            </>
+          ) : (
+            <p className="lead">Choose a note to read it.</p>
+          )}
         </section>
       </div>
     </>

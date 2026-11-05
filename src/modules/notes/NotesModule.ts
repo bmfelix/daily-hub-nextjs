@@ -7,12 +7,13 @@ import { HubModule, param, type SearchParams } from '../HubModule'
 import { NotesCard } from './NotesCard'
 import { NotesView } from './NotesView'
 
-export type NotesData = { notes: Note[]; note: Note | null; error?: string }
+export type NotesData = { notes: Note[]; note: Note | null }
 
+/** Shows notes. They are read-only here: the data comes from elsewhere. */
 export class NotesModule extends HubModule<NotesData, Note | null> {
   readonly slug = 'notes'
   readonly title = 'Notes'
-  readonly summary = 'Write, edit, and delete short notes.'
+  readonly summary = 'Short notes to read.'
   readonly View = NotesView
   readonly Card = NotesCard
 
@@ -30,10 +31,6 @@ export class NotesModule extends HubModule<NotesData, Note | null> {
     const note = noteId ? docs.find((item) => item.id === noteId) : null
     if (noteId && !note) notFound()
 
-    return {
-      notes: docs,
-      note: note ?? null,
-      error: param(params, 'error') === 'empty' ? 'Enter a note title.' : undefined,
-    }
+    return { notes: docs, note: note ?? null }
   }
 }

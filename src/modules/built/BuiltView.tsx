@@ -1,3 +1,5 @@
+import type { BuiltData } from './BuiltModule'
+
 const REPOS = ['django', 'nextjs', 'laravel']
 
 const ROWS = [
@@ -16,7 +18,7 @@ const PIECES = [
   ['Tests run offline', 'Each outside service sits behind a small client class, so tests swap in a fake and never touch the internet.'],
 ]
 
-export function BuiltView() {
+export function BuiltView({ data }: { data: BuiltData }) {
   return (
     <>
       <p className="kicker">Behind the mixing desk</p>
@@ -33,9 +35,11 @@ export function BuiltView() {
             <thead>
               <tr>
                 <th scope="col" />
-                <th scope="col">Django</th>
-                <th scope="col">Next.js</th>
-                <th scope="col">Laravel</th>
+                {Object.entries(data.sites).map(([name, url]) => (
+                  <th scope="col" key={name}>
+                    {url ? <a href={url}>{name}</a> : name}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
