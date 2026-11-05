@@ -31,7 +31,7 @@ Modules can also give the homepage a live card instead of their summary. Each st
 
 - `src/modules/HubModule.ts` defines the abstract `HubModule` class. Each module subclass returns its page data from `load()` and names a React server component (`View`) that renders it.
 - API modules keep HTTP calls in a client class (for example `OpenMeteoClient`) passed to the constructor. Tests pass a fake instead, so they run without the internet.
-- To-do and Notes write through Next.js server actions that call Payload's Local API (no HTTP round trip).
+- To-do and Notes read through Payload's Local API (no HTTP round trip).
 - `src/modules/index.ts` holds the `MODULES` list. The menu, the homepage cards, and the routes are built from it. `src/app/(frontend)/[slug]/page.tsx` renders a module if the slug matches one, otherwise a published CMS page.
 - To add a module: write the class and its view, add an instance to `MODULES`, and add its slug to `src/modules/slugs.ts` (this stops a CMS page from taking the same address).
 - The menu collapses into a "Menu" button below 1040px wide.
@@ -68,7 +68,7 @@ Click an artist on the homepage card or the Radio page to see everything MusicBr
 - **Agenda** reads iCal calendar links from `CALENDAR_URLS`, separated by commas. It is public on this build, because there is no login, so only add calendars you are happy to share.
 - **Spotify** on the homepage shows playlists from `SPOTIFY_PLAYLIST_URL` (several, separated by commas) and what is playing, with top artists and tracks on the Listening page.
 
-To-dos and notes can be changed by anyone who can reach the site, and the About page is edited in `src/modules/about/profile.ts`. Payload's own admin is left as it was and nothing here depends on it.
+To-dos and notes are read-only: nobody can add, change, or delete them from the site, and their data is meant to arrive from an outside API. The About page is edited in `src/modules/about/profile.ts`. Payload's own admin is left as it was and nothing here depends on it.
 
 The listener has no database access for these features: it calls `/live/sync` on the website, which saves plays and looks up a few songs and artists each time.
 
@@ -88,6 +88,8 @@ Everything here is optional. A feature without its setting explains itself on th
 | `GITHUB_USERNAME` | Recent work on the About page | Your GitHub username |
 
 Treat calendar links like passwords: anyone who has one can read that calendar.
+
+`DJANGO_SITE_URL`, `NEXTJS_SITE_URL`, and `LARAVEL_SITE_URL` turn the headings on the How it's built page into links to each live site. A heading stays plain text if its address is empty.
 
 ## Design
 

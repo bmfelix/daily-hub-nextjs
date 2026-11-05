@@ -7,6 +7,7 @@ import { connectState, playlistEmbeds, validState } from '@/lib/spotify'
 import { WikipediaClient } from '@/lib/wikipedia'
 import { fetchRepositories } from '@/modules/about/AboutModule'
 import { parseCalendar } from '@/modules/agenda/CalendarClient'
+import { BuiltModule } from '@/modules/built/BuiltModule'
 import { countArtists, countSongs, mondayOf } from '@/modules/charts/ChartsModule'
 import { concert } from '@/modules/concerts/TicketmasterClient'
 import { IHeartStation, TritonStation } from '@/modules/radio/stations'
@@ -185,6 +186,16 @@ describe('about', () => {
       ]),
     )
     expect((await fetchRepositories('x')).map((repo) => repo.name)).toEqual(['mine'])
+  })
+})
+
+describe('How it is built', () => {
+  it('uses the address set for each build', async () => {
+    vi.stubEnv('NEXTJS_SITE_URL', 'https://two.test')
+    vi.stubEnv('LARAVEL_SITE_URL', '')
+    const { sites } = await new BuiltModule().load()
+    expect(sites['Next.js']).toBe('https://two.test')
+    expect(sites.Laravel).toBe('')
   })
 })
 
