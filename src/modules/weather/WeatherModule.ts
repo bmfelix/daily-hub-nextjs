@@ -14,16 +14,35 @@ const WEATHER_CODES: Record<number, string> = {
   95: 'Thunderstorm', 96: 'Thunderstorm with hail', 99: 'Thunderstorm with hail',
 }
 
+// Countries and territories that report the weather in Fahrenheit.
+const FAHRENHEIT_COUNTRIES = new Set(['US', 'PR', 'GU', 'VI', 'AS', 'MP', 'BS', 'BZ', 'KY', 'LR', 'PW', 'FM', 'MH'])
+
 const label = (code: number) => WEATHER_CODES[code] ?? 'Unknown'
 
-export type WeatherData =
+type WeatherResult =
   | { city: string; error: string }
   | {
       city: string
       place: Place
+      temperatureUnit: string
+      windUnit: string
       current: { temperature: number; feelsLike: number; wind: number; label: string }
       days: { date: string; label: string; high: number; low: number }[]
     }
+
+export type WeatherData = WeatherResult & { locate: boolean }
+
+type Coordinates = { latitude: number; longitude: number }
+
+/** Read the visitor's position from the URL, ignoring missing or invalid values. */
+function readCoordinates(params: SearchParams): Coordinates | null {
+  const lat = param(params, 'lat')
+  const lon = param(params, 'lon')
+  if (!lat || !lon) return null
+  const latitude = Number(lat)
+  const longitude = Number(lon)
+  return Math.abs(latitude) <= 90 && Math.abs(longitude) <= 180 ? { latitude, longitude } : null
+}
 
 export class WeatherModule extends HubModule<WeatherData> {
   readonly slug = 'weather'
@@ -38,14 +57,33 @@ export class WeatherModule extends HubModule<WeatherData> {
   }
 
   async load(params: SearchParams): Promise<WeatherData> {
-    const city = param(params, 'city') || this.defaultCity
+    const searched = param(params, 'city')
+    const coordinates = searched ? null : readCoordinates(params)
+    // Only ask the browser for a location when nothing was chosen yet.
+    const locate = !searched && !coordinates
+    return { locate, ...(await this.lookup(searched, coordinates)) }
+  }
+
+  private async lookup(searched: string, coordinates: Coordinates | null): Promise<WeatherResult> {
+    let city = coordinates ? '' : searched || this.defaultCity
     try {
-      const place = await this.client.findPlace(city)
-      if (!place) return { city, error: `No place found called “${city}”.` }
-      const { current, daily } = await this.client.forecast(place.latitude, place.longitude)
+      const place = coordinates
+        ? await this.client.placeAt(coordinates.latitude, coordinates.longitude)
+        : await this.client.findPlace(city)
+      if (!place) {
+        return {
+          city,
+          error: coordinates ? 'No town found near your location.' : `No place found called “${city}”.`,
+        }
+      }
+      if (coordinates) city = place.name
+      const imperial = FAHRENHEIT_COUNTRIES.has(place.country_code ?? '')
+      const { current, daily } = await this.client.forecast(place.latitude, place.longitude, imperial)
       return {
         city,
         place,
+        temperatureUnit: imperial ? '°F' : '°C',
+        windUnit: imperial ? 'mph' : 'km/h',
         current: {
           temperature: current.temperature_2m,
           feelsLike: current.apparent_temperature,
