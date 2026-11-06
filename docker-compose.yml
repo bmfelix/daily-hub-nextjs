@@ -29,7 +29,7 @@ services:
   listener:
     build:
       context: .
-      target: listener
+      dockerfile: Dockerfile.listener
     env_file: .env
     environment:
       WEB_URL: http://web:3000
