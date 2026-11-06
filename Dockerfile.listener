@@ -1,0 +1,15 @@
+# The radio listener: a small Node process with the source it needs.
+# It has its own file because Railway cannot build a single stage of a Dockerfile.
+FROM node:24-alpine
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+
+COPY package.json package-lock.json .npmrc ./
+RUN npm ci
+
+ENV NODE_ENV=production
+COPY tsconfig.json ./
+COPY src/modules/radio ./src/modules/radio
+COPY src/listener ./src/listener
+USER node
+CMD ["node", "--import", "tsx", "src/listener/radio.ts"]

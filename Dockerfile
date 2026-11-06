@@ -13,16 +13,6 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
-# The radio listener: a small Node process with the source it needs.
-FROM base AS listener
-ENV NODE_ENV=production
-COPY --from=deps /app/node_modules ./node_modules
-COPY package.json tsconfig.json ./
-COPY src/modules/radio ./src/modules/radio
-COPY src/listener ./src/listener
-USER node
-CMD ["node", "--import", "tsx", "src/listener/radio.ts"]
-
 FROM base AS runner
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000 HOSTNAME=0.0.0.0
 RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nextjs
