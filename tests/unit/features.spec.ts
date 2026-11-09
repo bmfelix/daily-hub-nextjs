@@ -7,7 +7,9 @@ import { connectState, playlistEmbeds, validState } from '@/lib/spotify'
 import { WikipediaClient } from '@/lib/wikipedia'
 import { fetchRepositories } from '@/modules/about/AboutModule'
 import { parseCalendar } from '@/modules/agenda/CalendarClient'
+import { BratModule } from '@/modules/brat/BratModule'
 import { BuiltModule } from '@/modules/built/BuiltModule'
+import { MODULE_SLUGS } from '@/modules/slugs'
 import { countArtists, countSongs, mondayOf } from '@/modules/charts/ChartsModule'
 import { concert } from '@/modules/concerts/TicketmasterClient'
 import { IHeartStation, TritonStation } from '@/modules/radio/stations'
@@ -196,6 +198,15 @@ describe('How it is built', () => {
     const { sites } = await new BuiltModule().load()
     expect(sites['Next.js']).toBe('https://two.test')
     expect(sites.Laravel).toBe('')
+  })
+})
+
+describe('BRAT', () => {
+  it('has its own page and menu link, but no homepage card', () => {
+    const brat = new BratModule()
+    expect(brat.inMenu).toBe(true)
+    expect(brat.onHome).toBe(false)
+    expect(MODULE_SLUGS).toContain('brat')
   })
 })
 

@@ -1,5 +1,6 @@
 import { AboutModule } from './about/AboutModule'
 import { AgendaModule } from './agenda/AgendaModule'
+import { BratModule } from './brat/BratModule'
 import { BuiltModule } from './built/BuiltModule'
 import { ChartsModule } from './charts/ChartsModule'
 import { ConcertsModule } from './concerts/ConcertsModule'
@@ -23,6 +24,7 @@ export const MODULES: HubModule<any, any>[] = [
   new ChartsModule(),
   new ConcertsModule(),
   new ListeningModule(),
+  new BratModule(),
   new AboutModule(),
   new BuiltModule(),
 ]
