@@ -1,0 +1,524 @@
+/* The BRAT page: a World of Warcraft look (gold, night stone, embers) in place of the radio one.
+   Everything here applies only while a .brat element is on the page. */
+
+body:has(.brat) {
+  --bg: #0a0c12;
+  --text: #efe3c4;
+  --muted: #a89f8a;
+  --border: #3a3426;
+  --accent: #e9c46a;
+  --accent-soft: rgb(233 196 106 / 0.14);
+  --hot: #e8743b;
+  --cool: #66ccff;
+  --glass: rgb(16 17 24 / 0.8);
+  background:
+    radial-gradient(900px 600px at 12% -10%, rgb(233 150 60 / 0.16), transparent 70%),
+    radial-gradient(800px 600px at 92% 0%, rgb(80 120 220 / 0.14), transparent 70%),
+    radial-gradient(1200px 520px at 50% 112%, rgb(255 110 30 / 0.12), transparent 70%), var(--bg);
+  background-attachment: fixed;
+}
+body:has(.brat) .stage-lights,
+body:has(.brat) .note-field {
+  display: none;
+}
+
+.brat {
+  --gold: #e9c46a;
+  --gold-deep: #a8782a;
+  --gold-dim: rgb(233 196 106 / 0.35);
+  --parch: #efe3c4;
+  --lore-text: #d6ccb2;
+  --arcane: #66ccff;
+  --fantasy: 'Cinzel', Georgia, 'Times New Roman', serif;
+  --lore: 'Alegreya', Georgia, 'Times New Roman', serif;
+  font-family: var(--lore);
+  font-size: 1.1rem;
+}
+.brat h1,
+.brat h2,
+.brat h3 {
+  font-family: var(--fantasy);
+  letter-spacing: 0.03em;
+}
+
+/* Rising embers, where the other pages have music notes */
+.brat-embers {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.brat-embers span {
+  position: absolute;
+  bottom: -12px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  opacity: 0;
+  background: #ffb347;
+  box-shadow: 0 0 8px 2px rgb(255 140 40 / 0.7);
+  animation: brat-rise 12s linear infinite;
+}
+.brat-embers span:nth-child(1) {
+  left: 6%;
+  animation-delay: 0s;
+}
+.brat-embers span:nth-child(2) {
+  left: 17%;
+  animation-delay: -4s;
+  animation-duration: 15s;
+}
+.brat-embers span:nth-child(3) {
+  left: 29%;
+  animation-delay: -8s;
+  width: 3px;
+  height: 3px;
+}
+.brat-embers span:nth-child(4) {
+  left: 44%;
+  animation-delay: -2s;
+  animation-duration: 14s;
+}
+.brat-embers span:nth-child(5) {
+  left: 58%;
+  animation-delay: -10s;
+  width: 5px;
+  height: 5px;
+}
+.brat-embers span:nth-child(6) {
+  left: 71%;
+  animation-delay: -6s;
+  animation-duration: 13s;
+}
+.brat-embers span:nth-child(7) {
+  left: 83%;
+  animation-delay: -1s;
+  width: 3px;
+  height: 3px;
+}
+.brat-embers span:nth-child(8) {
+  left: 94%;
+  animation-delay: -9s;
+  animation-duration: 16s;
+}
+@keyframes brat-rise {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(48px, -105vh);
+    opacity: 0;
+  }
+}
+
+/* Hero: the name on one side, a sketch of the add-on on the other */
+.brat-hero {
+  display: grid;
+  gap: 30px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+@media (min-width: 900px) {
+  .brat-hero {
+    grid-template-columns: 1.1fr 1fr;
+  }
+}
+.brat .kicker {
+  font-family: var(--fantasy);
+  font-size: 0.78rem;
+  letter-spacing: 0.24em;
+  color: var(--gold);
+}
+.brat h1 {
+  margin: 0;
+  font-size: clamp(3.4rem, 12vw, 6.8rem);
+  font-weight: 800;
+  line-height: 1;
+  background: linear-gradient(180deg, #fff4cc 0%, #e9c46a 48%, #9c6a1e 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 3px 0 #2b1d08) drop-shadow(0 0 26px rgb(233 196 106 / 0.28));
+}
+.brat-tagline {
+  margin: 8px 0 20px;
+  font-family: var(--fantasy);
+  font-size: 0.92rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.brat .about-headline {
+  font-size: 1.32rem;
+  color: #e6dcc3;
+}
+.brat-button {
+  display: inline-block;
+  padding: 11px 24px;
+  border: 1px solid #5b3d0f;
+  border-radius: 4px;
+  font-family: var(--fantasy);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #2a1a05;
+  text-decoration: none;
+  background: linear-gradient(180deg, #ffe39a, #e0a93c 55%, #a8711f);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.5),
+    0 4px 14px rgb(0 0 0 / 0.45);
+}
+.brat-button:hover {
+  color: #2a1a05;
+  filter: brightness(1.12);
+}
+
+/* A gold-trimmed frame, used for panels and the sketch */
+.brat-frame {
+  position: relative;
+  border: 1px solid #6b5426;
+  border-radius: 6px;
+  background: linear-gradient(180deg, rgb(30 27 33 / 0.92), rgb(13 14 20 / 0.92));
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 0.6),
+    0 10px 30px rgb(0 0 0 / 0.45);
+}
+.brat-frame::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border: 1px solid rgb(233 196 106 / 0.14);
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+/* The sketch of BRAT's display */
+.brat-demo {
+  margin: 0;
+  padding: 28px 22px 18px;
+}
+.brat-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 16px;
+}
+.brat-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+}
+.brat-slot-label {
+  font-family: var(--fantasy);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.brat-icon {
+  --size: 50px;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--size);
+  height: var(--size);
+  border: 2px solid #1b1610;
+  border-radius: 6px;
+  background: var(--tint);
+  box-shadow:
+    0 0 0 1px #6b5426,
+    inset 0 0 12px rgb(0 0 0 / 0.6),
+    inset 0 2px 0 rgb(255 255 255 / 0.18);
+}
+.brat-icon svg {
+  width: 60%;
+  height: 60%;
+  fill: #fff7e0;
+  filter: drop-shadow(0 0 6px rgb(255 240 200 / 0.65));
+}
+.brat-now .brat-icon {
+  --size: 86px;
+  animation: brat-glow 1.6s ease-in-out infinite alternate;
+}
+.brat-next .brat-icon {
+  --size: 64px;
+}
+.brat-then .brat-icon {
+  --size: 52px;
+}
+.brat-soon .brat-icon {
+  --size: 44px;
+}
+.brat-fire {
+  --tint: radial-gradient(circle at 35% 30%, #ffcf6b, #e8611f 45%, #5a1406);
+}
+.brat-arcane {
+  --tint: radial-gradient(circle at 35% 30%, #b8f0ff, #3d8fe0 45%, #10204f);
+}
+.brat-holy {
+  --tint: radial-gradient(circle at 35% 30%, #fffbe0, #e3b53a 45%, #4d3507);
+}
+.brat-shadow {
+  --tint: radial-gradient(circle at 35% 30%, #e1b8ff, #7a3fc4 45%, #1d0b38);
+}
+.brat-key,
+.brat-rank {
+  position: absolute;
+  z-index: 2;
+  font-family: var(--body);
+  font-size: 0.74rem;
+  font-weight: 700;
+  line-height: 1;
+  text-shadow:
+    0 1px 2px #000,
+    0 0 3px #000;
+}
+.brat-key {
+  top: 4px;
+  right: 5px;
+  color: #fff;
+}
+.brat-rank {
+  bottom: 4px;
+  left: 5px;
+  color: var(--gold);
+}
+/* SOON: a cooldown sweep with the seconds left */
+.brat-cooldown::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  background: conic-gradient(rgb(0 0 0 / 0.68) 0 65%, transparent 0);
+}
+.brat-count {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  font-family: var(--body);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 1px 3px #000;
+}
+@keyframes brat-glow {
+  from {
+    box-shadow:
+      0 0 0 2px #ffd36b,
+      0 0 10px 2px rgb(255 200 90 / 0.35),
+      inset 0 0 12px rgb(0 0 0 / 0.6),
+      inset 0 2px 0 rgb(255 255 255 / 0.18);
+  }
+  to {
+    box-shadow:
+      0 0 0 2px #ffe7a6,
+      0 0 28px 8px rgb(255 200 90 / 0.7),
+      inset 0 0 12px rgb(0 0 0 / 0.6),
+      inset 0 2px 0 rgb(255 255 255 / 0.18);
+  }
+}
+.brat-demo figcaption {
+  margin-top: 20px;
+  text-align: center;
+  font-family: var(--lore);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+/* Section headings with gold rules either side */
+.brat-section {
+  margin-top: 48px;
+}
+.brat-section > h2 {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0 0 20px;
+  font-size: clamp(1.35rem, 3.6vw, 1.9rem);
+  font-weight: 700;
+  color: var(--gold);
+}
+.brat-section > h2::before,
+.brat-section > h2::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-dim));
+}
+.brat-section > h2::after {
+  background: linear-gradient(270deg, transparent, var(--gold-dim));
+}
+.brat-note {
+  margin: 14px 0 0;
+  text-align: center;
+  font-style: italic;
+  color: var(--muted);
+}
+
+/* Panels */
+.brat-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+.brat-grid li {
+  padding: 20px 22px;
+}
+.brat-grid h3 {
+  margin: 0 0 8px;
+  font-size: 1.08rem;
+  color: var(--parch);
+}
+.brat-grid p {
+  margin: 0;
+  color: var(--lore-text);
+  line-height: 1.55;
+}
+.brat-grid .brat-button {
+  margin-top: 14px;
+}
+.brat-runes {
+  counter-reset: rune;
+}
+.brat-runes li {
+  counter-increment: rune;
+}
+.brat-runes h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.brat-runes h3::before {
+  content: counter(rune, upper-roman);
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--gold-deep);
+  border-radius: 50%;
+  font-size: 0.72rem;
+  color: var(--gold);
+  background: radial-gradient(circle, #2a2213, #120f09);
+}
+
+/* Tables, in the style of an in-game tooltip */
+.brat-tooltip {
+  overflow-x: auto;
+  border: 1px solid #5d6c8f;
+  border-radius: 6px;
+  background: linear-gradient(180deg, rgb(10 14 30 / 0.95), rgb(6 8 18 / 0.95));
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 0.7),
+    0 10px 30px rgb(0 0 0 / 0.45);
+}
+.brat-tooltip table {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: collapse;
+}
+.brat-tooltip th,
+.brat-tooltip td {
+  padding: 13px 18px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid rgb(255 255 255 / 0.07);
+}
+.brat-tooltip tr:last-child th,
+.brat-tooltip tr:last-child td {
+  border-bottom: 0;
+}
+.brat-tooltip thead th {
+  font-family: var(--fantasy);
+  font-size: 1.05rem;
+  color: var(--gold);
+}
+.brat-tooltip tbody th {
+  font-family: var(--fantasy);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #9fb0cf;
+}
+.brat-tooltip td {
+  color: #e8e2d0;
+}
+.brat-priest {
+  color: #ffffff;
+}
+.brat-evoker {
+  color: #33937f;
+}
+.brat-status {
+  display: inline-block;
+  padding: 2px 11px;
+  border: 1px solid;
+  border-radius: 999px;
+  font-size: 0.9rem;
+}
+.brat-status-ok {
+  color: #7be07b;
+  border-color: rgb(123 224 123 / 0.4);
+  background: rgb(123 224 123 / 0.08);
+}
+.brat-status-wip {
+  color: var(--gold);
+  border-color: var(--gold-dim);
+  background: rgb(233 196 106 / 0.07);
+}
+
+/* Commands, shown as a chat log */
+.brat-chat {
+  margin: 0;
+  padding: 14px 20px;
+  border: 1px solid rgb(255 255 255 / 0.08);
+  border-radius: 4px;
+  background: rgb(0 0 0 / 0.55);
+}
+.brat-chat div {
+  display: grid;
+  grid-template-columns: minmax(150px, max-content) 1fr;
+  gap: 2px 18px;
+  padding: 7px 0;
+}
+.brat-chat dt {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: #fff;
+}
+.brat-chat dd {
+  margin: 0;
+  color: #e8e2d0;
+}
+.brat-chat dd::before {
+  content: 'BRAT: ';
+  color: var(--arcane);
+}
+@media (max-width: 560px) {
+  .brat-chat div {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brat-embers {
+    display: none;
+  }
+  .brat-now .brat-icon {
+    animation: none;
+  }
+}

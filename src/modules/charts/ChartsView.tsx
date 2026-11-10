@@ -4,12 +4,14 @@ import { PlayButton } from '@/components/PlayButton'
 import { hasPreview } from '@/lib/music/library'
 
 import { shortDate } from '../concerts/dates'
+import { Airwaves } from '../radio/Airwaves'
 import { artistUrl } from '../radio/data'
 import type { ChartsData } from './ChartsModule'
 
 export function ChartsView({ data }: { data: ChartsData }) {
   return (
-    <>
+    <div className="theme-radio">
+      <Airwaves />
       <p className="kicker">The weekly countdown</p>
       <h1>Charts</h1>
 
@@ -85,6 +87,6 @@ export function ChartsView({ data }: { data: ChartsData }) {
       )}
 
       <p className="source">Counted by Daily Hub from each station&apos;s song feed, from the day tracking began.</p>
-    </>
+    </div>
   )
 }

@@ -30,6 +30,14 @@ async function get(url: string) {
   return response
 }
 
+/** Where a station sits on an 88-108 FM dial, from 0 to 100. Reads the last number in the frequency. */
+export function dialPosition(frequency: string): number {
+  const numbers = frequency.match(/\d+(?:\.\d+)?/g)
+  if (!numbers) return 50
+  const percent = ((Number(numbers[numbers.length - 1]) - 88) / 20) * 100
+  return Math.round(Math.min(Math.max(percent, 0), 100) * 10) / 10
+}
+
 /** One radio station. Subclasses read song data from their broadcaster's API. */
 export abstract class Station {
   constructor(

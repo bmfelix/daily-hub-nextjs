@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import type { HackerNewsClient } from '@/modules/news/HackerNewsClient'
+import { type GoogleNewsClient, parseFeed } from '@/modules/news/GoogleNewsClient'
 import { NewsModule } from '@/modules/news/NewsModule'
 import type { OpenMeteoClient } from '@/modules/weather/OpenMeteoClient'
-import { WeatherModule } from '@/modules/weather/WeatherModule'
+import { sky, WeatherModule } from '@/modules/weather/WeatherModule'
 
 // Fakes stand in for the HTTP clients, so these tests run without the internet.
 const fake = <T>(methods: Partial<T>) => methods as T
@@ -42,9 +42,14 @@ describe('WeatherModule', () => {
     const data = await new WeatherModule(weatherClient).load({ city: 'Paris' })
     if ('error' in data) throw new Error(data.error)
     expect(data.place.name).toBe('Paris')
-    expect(data.current).toEqual({ temperature: 9.2, feelsLike: 7, wind: 12, label: 'Overcast' })
+    expect(data.current).toEqual({ temperature: 9.2, feelsLike: 7, wind: 12, label: 'Overcast', sky: 'cloudy' })
     expect(data).toMatchObject({ temperatureUnit: '°C', windUnit: 'km/h' })
     expect(data.days.map((day) => day.label)).toEqual(['Clear sky', 'Light rain'])
+    expect(data.days.map((day) => day.sky)).toEqual(['clear', 'rain'])
+  })
+
+  it('groups weather codes into skies', () => {
+    expect([0, 3, 45, 63, 75, 95].map(sky)).toEqual(['clear', 'cloudy', 'fog', 'rain', 'snow', 'storm'])
   })
 
   it('uses Fahrenheit and mph in the United States', async () => {
@@ -98,27 +103,36 @@ describe('WeatherModule', () => {
 })
 
 describe('NewsModule', () => {
-  const client = fake<HackerNewsClient>({
-    frontPage: async () => [
-      { objectID: '1', title: 'With link', url: 'https://example.com', points: 10, num_comments: 3, author: 'ann' },
-      { objectID: '2', title: 'Ask HN', url: null, points: null, num_comments: null, author: 'bob' },
+  const client = fake<GoogleNewsClient>({
+    topStories: async () => [
+      { title: 'Big story - BBC', link: 'https://example.com/big', source: 'BBC', published: 'Tue, 10 Nov 2026 01:38:49 GMT' },
+      { title: 'No source', link: 'https://example.com/other', source: '', published: 'not a date' },
     ],
   })
 
-  it('maps stories', async () => {
+  it('shows the source on its own line instead of in the headline', async () => {
     const data = await new NewsModule(client).load()
     if ('error' in data) throw new Error(data.error)
-    expect(data.stories[0]).toMatchObject({ title: 'With link', url: 'https://example.com', comments: 3 })
+    expect(data.stories[0]).toMatchObject({ title: 'Big story', url: 'https://example.com/big', source: 'BBC', published: '2026-11-10T01:38:49.000Z' })
   })
 
-  it('links a story without a URL to its discussion', async () => {
+  it('keeps a story without a source or date', async () => {
     const data = await new NewsModule(client).load()
     if ('error' in data) throw new Error(data.error)
-    expect(data.stories[1]).toMatchObject({ url: 'https://news.ycombinator.com/item?id=2', points: 0, comments: 0 })
+    expect(data.stories[1]).toMatchObject({ title: 'No source', published: null })
+  })
+
+  it('reads the Google News feed', () => {
+    const items = parseFeed(
+      '<rss><channel><item><title>Ben &amp; Jerry&#39;s - NPR</title><link>https://news.google.com/a</link>' +
+        '<pubDate>Tue, 10 Nov 2026 01:00:00 GMT</pubDate><source url="https://www.npr.org">NPR</source></item></channel></rss>',
+    )
+    expect(items).toEqual([{ title: "Ben & Jerry's - NPR", link: 'https://news.google.com/a', published: 'Tue, 10 Nov 2026 01:00:00 GMT', source: 'NPR' }])
+    expect(() => parseFeed('not xml')).toThrow()
   })
 
   it('reports when the service is down', async () => {
-    const data = await new NewsModule(fake<HackerNewsClient>({ frontPage: down })).load()
+    const data = await new NewsModule(fake<GoogleNewsClient>({ topStories: down })).load()
     expect(data).toMatchObject({ error: expect.stringContaining('did not respond') })
   })
 })

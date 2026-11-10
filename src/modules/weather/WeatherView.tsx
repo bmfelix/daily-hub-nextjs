@@ -1,9 +1,12 @@
 import { LocateVisitor } from './LocateVisitor'
+import { SkyArt } from './SkyArt'
 import type { WeatherData } from './WeatherModule'
 
 export function WeatherView({ data }: { data: WeatherData }) {
+  const sky = 'error' in data ? 'clear' : data.current.sky
   return (
-    <>
+    <div className={`theme-weather sky-${sky}`}>
+      <SkyArt />
       <p className="kicker">Outside the venue</p>
       <h1>Weather</h1>
 
@@ -18,6 +21,9 @@ export function WeatherView({ data }: { data: WeatherData }) {
       ) : (
         <>
           <section className="sky">
+            <svg className="wx-icon wx-big" aria-hidden="true">
+              <use href={`#wx-${data.current.sky}`} />
+            </svg>
             <h2>
               {data.place.name}
               {data.place.country && `, ${data.place.country}`}
@@ -37,7 +43,12 @@ export function WeatherView({ data }: { data: WeatherData }) {
             {data.days.map((day) => (
               <li key={day.date}>
                 <strong>{day.weekday}</strong>
-                <span>{day.label}</span>
+                <span className="wx-label">
+                  <svg className="wx-icon" aria-hidden="true">
+                    <use href={`#wx-${day.sky}`} />
+                  </svg>
+                  {day.label}
+                </span>
                 <span className="range" aria-hidden="true">
                   <span style={{ left: `${day.barStart}%`, width: `${day.barWidth}%` }} />
                 </span>
@@ -53,6 +64,6 @@ export function WeatherView({ data }: { data: WeatherData }) {
       <p className="source">Data: Open-Meteo · Place names: OpenStreetMap</p>
 
       {data.locate && <LocateVisitor />}
-    </>
+    </div>
   )
 }

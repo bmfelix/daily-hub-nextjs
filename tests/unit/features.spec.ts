@@ -12,7 +12,7 @@ import { BuiltModule } from '@/modules/built/BuiltModule'
 import { MODULE_SLUGS } from '@/modules/slugs'
 import { countArtists, countSongs, mondayOf } from '@/modules/charts/ChartsModule'
 import { concert } from '@/modules/concerts/TicketmasterClient'
-import { IHeartStation, TritonStation } from '@/modules/radio/stations'
+import { dialPosition, IHeartStation, TritonStation } from '@/modules/radio/stations'
 
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status })
 
@@ -198,6 +198,14 @@ describe('How it is built', () => {
     const { sites } = await new BuiltModule().load()
     expect(sites['Next.js']).toBe('https://two.test')
     expect(sites.Laravel).toBe('')
+  })
+})
+
+describe('radio dial', () => {
+  it('places each station on the FM band', () => {
+    expect(dialPosition('102.7 FM')).toBe(73.5)
+    expect(dialPosition('Q102 · 101.9 FM')).toBe(69.5)
+    expect(dialPosition('AM')).toBe(50)
   })
 })
 
