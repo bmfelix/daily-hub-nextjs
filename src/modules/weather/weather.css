@@ -1,0 +1,119 @@
+/* The Weather page: the sky outside. The background and effects follow the current weather
+   (clear, cloudy, rain, snow, storm, fog), and each day gets an icon. Applies only while
+   .theme-weather is on the page; .sky-* on the same element picks the sky. */
+
+body:has(.theme-weather) {
+  --bg: #0b1a2e;
+  --surface: rgb(16 28 48 / 0.6);
+  --raised: rgb(255 255 255 / 0.12);
+  --glass: rgb(16 28 48 / 0.55);
+  --text: #f2f7ff;
+  --muted: #a9b8cc;
+  --border: rgb(255 255 255 / 0.14);
+  --accent: #ffd25e;
+  --accent-soft: rgb(255 210 94 / 0.14);
+  --hot: #ff8a5c;
+  --cool: #6cc4ff;
+  background: var(--sky-bg, var(--bg));
+  background-attachment: fixed;
+}
+body:has(.theme-weather) .stage-lights,
+body:has(.theme-weather) .note-field { display: none; }
+
+body:has(.sky-clear) { --sky-bg: radial-gradient(700px 500px at 88% -6%, rgb(255 210 94 / 0.32), transparent 70%), linear-gradient(180deg, #1d5597 0%, #12345f 45%, #0b1a2e 100%); }
+body:has(.sky-cloudy) { --sky-bg: linear-gradient(180deg, #3d516b 0%, #23344c 50%, #111a28 100%); }
+body:has(.sky-rain) { --sky-bg: linear-gradient(180deg, #2c3b50 0%, #18222f 55%, #0d131c 100%); }
+body:has(.sky-snow) { --sky-bg: linear-gradient(180deg, #5d7290 0%, #34465b 50%, #1a2433 100%); }
+body:has(.sky-storm) { --sky-bg: radial-gradient(600px 400px at 30% 0%, rgb(160 120 255 / 0.18), transparent 70%), linear-gradient(180deg, #25213b 0%, #151425 55%, #0b0b14 100%); }
+body:has(.sky-fog) { --sky-bg: linear-gradient(180deg, #4b5563 0%, #2f3742 50%, #1a1f26 100%); }
+
+/* Sky effects, behind everything */
+.sky-fx { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.sky-fx > span { position: absolute; }
+.sky-fx .sun {
+  display: none; top: -130px; right: -70px; width: 380px; height: 380px; border-radius: 50%;
+  background: radial-gradient(circle, #fff6cf 0 16%, #ffd25e 28%, rgb(255 210 94 / 0.25) 48%, transparent 70%);
+  animation: sun-glow 6s ease-in-out infinite alternate;
+}
+.sky-clear .sun { display: block; }
+@keyframes sun-glow { from { transform: scale(1); opacity: 0.9; } to { transform: scale(1.06); opacity: 1; } }
+
+.sky-fx .cloud {
+  left: -620px; width: 460px; height: 120px; border-radius: 999px;
+  background: rgb(230 238 248 / 0.12); filter: blur(20px);
+  animation: cloud-drift 70s linear infinite;
+}
+.sky-fx .cloud-1 { top: 90px; }
+.sky-fx .cloud-2 { top: 230px; width: 600px; animation-duration: 95s; animation-delay: -40s; }
+.sky-fx .cloud-3 { top: 30px; width: 360px; animation-duration: 80s; animation-delay: -65s; }
+@keyframes cloud-drift { to { transform: translateX(calc(100vw + 700px)); } }
+.sky-clear .cloud { opacity: 0.4; }
+.sky-cloudy .cloud, .sky-fog .cloud, .sky-snow .cloud { background: rgb(230 238 248 / 0.2); }
+.sky-rain .cloud, .sky-storm .cloud { background: rgb(12 16 28 / 0.6); }
+
+.sky-fx .precip { inset: 0; display: none; }
+.sky-rain .precip, .sky-storm .precip {
+  display: block;
+  background: linear-gradient(105deg, transparent 47%, rgb(170 210 255 / 0.35) 48% 50%, transparent 51%) 0 0 / 40px 90px;
+  animation: rain-fall 0.45s linear infinite;
+}
+@keyframes rain-fall { to { background-position: -24px 90px; } }
+.sky-snow .precip {
+  display: block;
+  background:
+    radial-gradient(circle, #fff 0 1.6px, transparent 2.2px) 0 0 / 120px 120px,
+    radial-gradient(circle, rgb(255 255 255 / 0.7) 0 1px, transparent 1.6px) 35px 20px / 70px 70px;
+  animation: snow-fall 14s linear infinite;
+}
+@keyframes snow-fall { to { background-position: 120px 480px, 105px 440px; } }
+.sky-fog .precip { display: block; background: linear-gradient(180deg, transparent 25%, rgb(200 210 225 / 0.12) 60%, rgb(200 210 225 / 0.22)); }
+.sky-fx .flash { inset: 0; display: none; }
+.sky-storm .flash { display: block; animation: lightning 7s infinite; }
+@keyframes lightning {
+  0%, 89%, 92%, 95%, 100% { background: transparent; }
+  90%, 93.5% { background: rgb(220 225 255 / 0.28); }
+}
+
+/* Icons */
+.wx-icon { width: 30px; height: 30px; flex-shrink: 0; overflow: visible; }
+.wx-sun { fill: #ffd25e; }
+.wx-rays { fill: none; stroke: #ffd25e; stroke-width: 3; stroke-linecap: round; }
+.wx-cloud { fill: #e9f0fa; }
+.wx-dark { fill: #9aa6bd; }
+.wx-drop { fill: none; stroke: #6cc4ff; stroke-width: 3; stroke-linecap: round; }
+.wx-flake { fill: #fff; }
+.wx-bolt { fill: #ffd25e; }
+.wx-mist { fill: none; stroke: #c9d4e2; stroke-width: 3; stroke-linecap: round; }
+
+/* The current conditions: a pane of glass with the big icon */
+.theme-weather .kicker { color: var(--accent); }
+.theme-weather .sky {
+  position: relative; overflow: hidden; padding-right: clamp(30px, 22vw, 240px);
+  border: 1px solid rgb(255 255 255 / 0.2);
+  background: linear-gradient(135deg, rgb(255 255 255 / 0.16), rgb(255 255 255 / 0.04));
+  backdrop-filter: blur(14px);
+  box-shadow: 0 20px 50px rgb(0 0 0 / 0.3), inset 0 1px 0 rgb(255 255 255 / 0.25);
+}
+.theme-weather .sky p { color: #dbe6f5; }
+.theme-weather .wx-big {
+  position: absolute; top: 50%; right: clamp(20px, 4vw, 50px); width: clamp(90px, 15vw, 170px); height: auto; aspect-ratio: 1;
+  transform: translateY(-50%); filter: drop-shadow(0 10px 26px rgb(0 0 0 / 0.35));
+}
+@media (max-width: 620px) {
+  .theme-weather .sky { padding-right: 30px; }
+  .theme-weather .wx-big { top: 22px; width: 64px; transform: none; }
+}
+
+/* The week ahead */
+.theme-weather .week li { border-color: rgb(255 255 255 / 0.12); background: rgb(255 255 255 / 0.07); backdrop-filter: blur(8px); }
+.wx-label { display: flex; align-items: center; gap: 12px; }
+.theme-weather .range span { background: linear-gradient(90deg, #6cc4ff, #ffd25e, #ff8a5c); }
+.theme-weather .inline-form input { background: rgb(255 255 255 / 0.08); border-color: rgb(255 255 255 / 0.2); }
+.theme-weather .inline-form button { color: #231a02; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sky-fx .sun, .sky-fx .cloud, .sky-fx .precip, .sky-fx .flash { animation: none; }
+  .sky-fx .cloud-1 { transform: translateX(30vw); }
+  .sky-fx .cloud-2 { transform: translateX(65vw); }
+  .sky-fx .cloud-3 { transform: translateX(95vw); }
+}

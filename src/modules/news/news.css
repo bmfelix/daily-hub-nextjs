@@ -1,0 +1,61 @@
+/* The News page: the morning paper. A newsprint sheet on a dark desk, a blackletter masthead,
+   and headlines set in columns. Applies only while .theme-news is on the page. */
+
+body:has(.theme-news) {
+  --accent: #efe6d0;
+  --hot: #c0392b;
+  --cool: #efe6d0;
+  background:
+    radial-gradient(1000px 600px at 50% -10%, rgb(255 240 210 / 0.09), transparent 70%),
+    #141210;
+  background-attachment: fixed;
+}
+body:has(.theme-news) .stage-lights,
+body:has(.theme-news) .note-field { display: none; }
+
+.theme-news {
+  --ink: #1b1a17;
+  --ink-soft: #5d574b;
+  --rule: #c9c1ac;
+  --headline: "Playfair Display", Georgia, "Times New Roman", serif;
+  --print: "Source Serif 4", Georgia, "Times New Roman", serif;
+}
+
+/* The sheet of newsprint */
+.paper {
+  padding: clamp(18px, 4vw, 44px);
+  border-radius: 2px;
+  color: var(--ink);
+  font-family: var(--print);
+  background:
+    radial-gradient(rgb(0 0 0 / 0.03) 1px, transparent 1px) 0 0 / 4px 4px,
+    linear-gradient(180deg, #f6f1e5, #efe8d6);
+  box-shadow: 0 30px 60px rgb(0 0 0 / 0.55), 0 2px 0 rgb(255 255 255 / 0.4) inset;
+}
+
+/* Masthead */
+.paper-ears, .paper-dateline {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; margin: 0;
+  font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-soft);
+}
+.paper-ears { padding-bottom: 8px; }
+.paper-title {
+  margin: 6px 0 10px; text-align: center; color: #111;
+  font-family: "UnifrakturMaguntia", var(--headline); font-weight: 400; font-size: clamp(2.8rem, 10vw, 6rem); line-height: 1; letter-spacing: 0;
+}
+.paper-dateline { margin-bottom: 24px; padding: 7px 0; border-top: 3px double var(--ink); border-bottom: 1px solid var(--ink); color: var(--ink); }
+
+/* Stories in columns, the lead across the top */
+.paper-stories { list-style: none; margin: 0; padding: 0; columns: 3 240px; column-gap: 34px; column-rule: 1px solid var(--rule); }
+.paper-story { break-inside: avoid; margin: 0 0 14px; padding: 0 0 14px; border-bottom: 1px solid var(--rule); }
+.paper-lead { column-span: all; margin-bottom: 22px; padding-bottom: 22px; border-bottom: 3px double var(--ink); text-align: center; }
+.paper-headline { display: block; font-family: var(--headline); font-size: 1.22rem; font-weight: 700; line-height: 1.15; color: #111; text-decoration: none; }
+.paper-headline:hover { color: #111; text-decoration: underline; text-decoration-thickness: 1px; }
+.paper-lead .paper-headline { max-width: 26ch; margin: 0 auto; font-size: clamp(1.9rem, 5vw, 3.3rem); font-weight: 900; line-height: 1.04; }
+.paper-story:nth-child(2) .paper-headline,
+.paper-story:nth-child(3) .paper-headline { font-size: 1.55rem; }
+.paper-byline { display: block; margin-top: 7px; font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-soft); }
+.paper-lead .paper-byline { margin-top: 12px; }
+
+.paper .notice { background: none; border: 1px solid var(--ink); color: var(--ink); }
+.paper .source { margin-top: 20px; padding-top: 10px; border-top: 1px solid var(--ink); font-family: var(--print); font-size: 0.78rem; color: var(--ink-soft); text-shadow: none; }

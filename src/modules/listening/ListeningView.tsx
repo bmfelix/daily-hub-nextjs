@@ -2,11 +2,31 @@ import Link from 'next/link'
 
 import { HideOnError } from '@/components/HideOnError'
 
+import './phones.css'
+
 import { type ListeningData, RANGES } from './ListeningModule'
+
+/** Headphones with sound coming out, where other pages have music notes. */
+function Headphones() {
+  return (
+    <div className="phones-art" aria-hidden="true">
+      <svg viewBox="0 0 200 170">
+        <path className="phones-band" d="M44 104V86a56 56 0 0 1 112 0v18" />
+        <rect className="phones-cup" x="28" y="96" width="32" height="56" rx="13" />
+        <rect className="phones-cup" x="140" y="96" width="32" height="56" rx="13" />
+        <path className="phones-wave" d="M16 108q-9 16 0 32" />
+        <path className="phones-wave far" d="M5 98q-16 26 0 52" />
+        <path className="phones-wave" d="M184 108q9 16 0 32" />
+        <path className="phones-wave far" d="M195 98q16 26 0 52" />
+      </svg>
+    </div>
+  )
+}
 
 export function ListeningView({ data }: { data: ListeningData }) {
   return (
-    <>
+    <div className="theme-phones">
+      <Headphones />
       <p className="kicker">On heavy rotation</p>
       <h1>Listening</h1>
 
@@ -61,6 +81,6 @@ export function ListeningView({ data }: { data: ListeningData }) {
       )}
 
       <p className="source">Data: Spotify</p>
-    </>
+    </div>
   )
 }

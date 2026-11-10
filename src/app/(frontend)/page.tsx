@@ -29,7 +29,7 @@ export default async function HomePage() {
       <header className="home-intro">
         <p className="kicker">{today.format(new Date())}</p>
         <h1>
-          Your day, <em>on repeat.</em>
+          My day, <em>on repeat.</em>
         </h1>
       </header>
 

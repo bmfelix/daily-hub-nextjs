@@ -1,0 +1,83 @@
+/* The About page: a composer's study. Candlelit dark, engraved serif type, the music notes resting
+   on a staff, and projects written on manuscript paper. Applies only while .theme-score is on the page. */
+
+body:has(.theme-score) {
+  --bg: #0f0d0b;
+  --text: #f3ead8;
+  --muted: #b3a58c;
+  --border: #3a3127;
+  --accent: #d4ad62;
+  --accent-soft: rgb(212 173 98 / 0.14);
+  --hot: #b5523b;
+  --cool: #d4ad62;
+  background:
+    radial-gradient(800px 560px at 85% -10%, rgb(255 190 110 / 0.14), transparent 70%),
+    radial-gradient(700px 500px at 0% 20%, rgb(140 70 40 / 0.14), transparent 70%),
+    var(--bg);
+  background-attachment: fixed;
+}
+body:has(.theme-score) .stage-lights { display: none; }
+
+/* A bar of melody on a five-line staff, in ivory (for the dark page) and ink (for paper).
+   Repeated across any empty staff, so there are always notes on the lines. */
+body:has(.theme-score) {
+  --melody-ivory: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 60'%3E%3Cpath d='M0 10H300M0 20H300M0 30H300M0 40H300M0 50H300M299 10V50' stroke='%23f3ead8' stroke-opacity='.3'/%3E%3Cg fill='%23f3ead8' stroke='%23f3ead8' stroke-width='1.6' opacity='.75'%3E%3Cellipse cx='18' cy='45' rx='5' ry='3.6' transform='rotate(-20 18 45)'/%3E%3Cpath d='M22.5 44V16'/%3E%3Cellipse cx='46' cy='35' rx='5' ry='3.6' transform='rotate(-20 46 35)'/%3E%3Cpath d='M50.5 34V6'/%3E%3Cellipse cx='74' cy='30' rx='5' ry='3.6' transform='rotate(-20 74 30)'/%3E%3Cpath d='M78.5 29V2'/%3E%3Cellipse cx='102' cy='20' rx='5' ry='3.6' transform='rotate(-20 102 20)'/%3E%3Cpath d='M97.5 21V49'/%3E%3Cellipse cx='132' cy='40' rx='5' ry='3.6' transform='rotate(-20 132 40)'/%3E%3Cellipse cx='156' cy='30' rx='5' ry='3.6' transform='rotate(-20 156 30)'/%3E%3Cpath d='M136.5 39V12M160.5 29V4'/%3E%3Cpath d='M136.5 12 160.5 4v4l-24 8z'/%3E%3Cellipse cx='188' cy='25' rx='5' ry='3.6' fill='none' transform='rotate(-20 188 25)'/%3E%3Cpath d='M183.5 26V54'/%3E%3Cellipse cx='216' cy='35' rx='5' ry='3.6' transform='rotate(-20 216 35)'/%3E%3Cpath d='M220.5 34V6'/%3E%3Cellipse cx='244' cy='15' rx='5' ry='3.6' transform='rotate(-20 244 15)'/%3E%3Cpath d='M239.5 16V44'/%3E%3Cellipse cx='272' cy='40' rx='5' ry='3.6' transform='rotate(-20 272 40)'/%3E%3Cpath d='M276.5 39V11'/%3E%3C/g%3E%3C/svg%3E");
+  --melody-ink: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 60'%3E%3Cpath d='M0 10H300M0 20H300M0 30H300M0 40H300M0 50H300M299 10V50' stroke='%233a2a18' stroke-opacity='.45'/%3E%3Cg fill='%233a2a18' stroke='%233a2a18' stroke-width='1.6' opacity='.85'%3E%3Cellipse cx='18' cy='45' rx='5' ry='3.6' transform='rotate(-20 18 45)'/%3E%3Cpath d='M22.5 44V16'/%3E%3Cellipse cx='46' cy='35' rx='5' ry='3.6' transform='rotate(-20 46 35)'/%3E%3Cpath d='M50.5 34V6'/%3E%3Cellipse cx='74' cy='30' rx='5' ry='3.6' transform='rotate(-20 74 30)'/%3E%3Cpath d='M78.5 29V2'/%3E%3Cellipse cx='102' cy='20' rx='5' ry='3.6' transform='rotate(-20 102 20)'/%3E%3Cpath d='M97.5 21V49'/%3E%3Cellipse cx='132' cy='40' rx='5' ry='3.6' transform='rotate(-20 132 40)'/%3E%3Cellipse cx='156' cy='30' rx='5' ry='3.6' transform='rotate(-20 156 30)'/%3E%3Cpath d='M136.5 39V12M160.5 29V4'/%3E%3Cpath d='M136.5 12 160.5 4v4l-24 8z'/%3E%3Cellipse cx='188' cy='25' rx='5' ry='3.6' fill='none' transform='rotate(-20 188 25)'/%3E%3Cpath d='M183.5 26V54'/%3E%3Cellipse cx='216' cy='35' rx='5' ry='3.6' transform='rotate(-20 216 35)'/%3E%3Cpath d='M220.5 34V6'/%3E%3Cellipse cx='244' cy='15' rx='5' ry='3.6' transform='rotate(-20 244 15)'/%3E%3Cpath d='M239.5 16V44'/%3E%3Cellipse cx='272' cy='40' rx='5' ry='3.6' transform='rotate(-20 272 40)'/%3E%3Cpath d='M276.5 39V11'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* The drifting notes become ink on a staff */
+body:has(.theme-score) .note-field {
+  background: var(--melody-ivory) 0 40px / auto 90px repeat-x;
+  -webkit-mask: linear-gradient(90deg, transparent, #000 30%);
+  mask: linear-gradient(90deg, transparent, #000 30%);
+}
+body:has(.theme-score) .note { color: #f3ead8; opacity: 0.8; filter: none; }
+
+.theme-score {
+  --engraved: "Cormorant Garamond", Garamond, Georgia, serif;
+  --ink: #2a2118;
+  --paper: #f4ecd8;
+  font-family: "EB Garamond", Garamond, Georgia, serif;
+  font-size: 1.1rem;
+}
+.theme-score .kicker { font-family: var(--engraved); font-size: 1rem; font-style: italic; letter-spacing: 0.06em; text-transform: none; color: var(--accent); }
+.theme-score h1 { font-family: var(--engraved); font-size: clamp(3rem, 10vw, 5.6rem); font-weight: 600; font-style: italic; letter-spacing: -0.01em; }
+.theme-score .about-headline { font-family: var(--engraved); font-size: 1.55rem; font-style: italic; color: #e8dcc4; }
+.theme-score .artist-about p { line-height: 1.7; }
+
+/* Links: brass buttons */
+.theme-score .artist-actions .pill { border-radius: 3px; border-color: rgb(212 173 98 / 0.5); font-family: var(--engraved); font-size: 1.05rem; font-weight: 600; letter-spacing: 0.04em; }
+.theme-score .artist-actions .pill-solid { color: #2a1d08; background: linear-gradient(180deg, #ecd08f, #c79a45); border-color: #8a6524; }
+
+/* Section headings read like tempo markings, followed by a staff of melody */
+.theme-score .about-section > h2 {
+  display: flex; align-items: center; gap: 18px;
+  font-family: var(--engraved); font-size: 2rem; font-weight: 700; font-style: italic; color: var(--text);
+}
+.theme-score .about-section > h2::after {
+  content: ""; flex: 1; height: 40px;
+  background: var(--melody-ivory) left center / auto 100% repeat-x;
+  -webkit-mask: linear-gradient(90deg, #000 70%, transparent);
+  mask: linear-gradient(90deg, #000 70%, transparent);
+}
+
+/* Projects on manuscript paper, with a staff of notes along the bottom, below the writing */
+.theme-score .project-list .panel {
+  position: relative; padding-bottom: 72px;
+  border: 1px solid #d9c9a3; border-radius: 3px; color: var(--ink); backdrop-filter: none;
+  background: var(--paper);
+  box-shadow: 0 14px 34px rgb(0 0 0 / 0.5), inset 0 0 40px rgb(150 110 50 / 0.12);
+}
+.theme-score .project-list .panel::after {
+  content: ""; position: absolute; left: 20px; right: 20px; bottom: 16px; height: 40px;
+  background: var(--melody-ink) left center / auto 100% repeat-x;
+}
+/* Each card starts the melody at a different bar, so they don't all look the same */
+.theme-score .project-list .panel:nth-child(3n + 2)::after { background-position: -100px center; }
+.theme-score .project-list .panel:nth-child(3n + 3)::after { background-position: -200px center; }
+.theme-score .project-list h3 { font-family: var(--engraved); font-size: 1.45rem; font-weight: 700; color: var(--ink); }
+.theme-score .project-list p { color: #43372a; }
+.theme-score .project-list a { color: #7a4f12; }
+.theme-score .project-list a:hover { color: #a3691a; }
+.theme-score .project-list .meta { font-family: var(--engraved); font-size: 0.95rem; font-style: italic; letter-spacing: 0; color: #6b5a45; text-shadow: none; }
+.theme-score .project-list .chips li { background: none; border-color: rgb(42 33 24 / 0.3); color: #4a3c2c; font-family: var(--engraved); font-size: 0.9rem; font-style: italic; }

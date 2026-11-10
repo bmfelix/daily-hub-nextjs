@@ -14,7 +14,7 @@ This is one of three builds of the same app (Django, Next.js, Laravel), so the f
 | Page     | Class            | Data source                                   |
 |----------|------------------|-----------------------------------------------|
 | Weather  | `WeatherModule`  | [Open-Meteo](https://open-meteo.com) (no key) |
-| News     | `NewsModule`     | [Hacker News search API](https://hn.algolia.com/api) (no key) |
+| News     | `NewsModule`     | [Google News](https://news.google.com) top-stories RSS feed (no key; personal, non-commercial use only) |
 | To-do    | `TodoModule`     | Payload `tasks` collection                    |
 | Concerts | `ConcertsModule` | [Ticketmaster Discovery API](https://developer.ticketmaster.com) (free key) |
 | Notes    | `NotesModule`    | Payload `notes` collection                    |

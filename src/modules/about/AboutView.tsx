@@ -1,10 +1,16 @@
+import './score.css'
+
 import type { AboutData } from './AboutModule'
 import { PROFILE } from './profile'
 
+const SCORE_FONTS =
+  'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500..700;1,500..700&family=EB+Garamond:ital,wght@0,400..600;1,400..600&display=swap'
+
 export function AboutView({ data }: { data: AboutData }) {
   return (
-    <>
-      <p className="kicker">Meet the band</p>
+    <div className="theme-score">
+      <link rel="stylesheet" href={SCORE_FONTS} precedence="default" />
+      <p className="kicker">Composed by</p>
       <h1>{PROFILE.name || 'About'}</h1>
 
       {PROFILE.headline && <p className="about-headline">{PROFILE.headline}</p>}
@@ -85,6 +91,6 @@ export function AboutView({ data }: { data: AboutData }) {
           </ul>
         </section>
       )}
-    </>
+    </div>
   )
 }

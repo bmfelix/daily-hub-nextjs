@@ -20,6 +20,18 @@ const FAHRENHEIT_COUNTRIES = new Set(['US', 'PR', 'GU', 'VI', 'AS', 'MP', 'BS', 
 
 const label = (code: number) => WEATHER_CODES[code] ?? 'Unknown'
 
+export type Sky = 'clear' | 'cloudy' | 'rain' | 'snow' | 'storm' | 'fog'
+
+/** The kind of sky a weather code means, for the page's look and the day icons. */
+export function sky(code: number): Sky {
+  if (code === 0 || code === 1) return 'clear'
+  if (code === 45 || code === 48) return 'fog'
+  if ((code >= 71 && code <= 77) || code === 85 || code === 86) return 'snow'
+  if (code >= 95) return 'storm'
+  if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return 'rain'
+  return 'cloudy'
+}
+
 type WeatherResult =
   | { city: string; error: string }
   | {
@@ -27,8 +39,8 @@ type WeatherResult =
       place: Place
       temperatureUnit: string
       windUnit: string
-      current: { temperature: number; feelsLike: number; wind: number; label: string }
-      days: { date: string; weekday: string; label: string; high: number; low: number; barStart: number; barWidth: number }[]
+      current: { temperature: number; feelsLike: number; wind: number; label: string; sky: Sky }
+      days: { date: string; weekday: string; label: string; sky: Sky; high: number; low: number; barStart: number; barWidth: number }[]
     }
 
 export type WeatherData = WeatherResult & { locate: boolean }
@@ -99,11 +111,13 @@ export class WeatherModule extends HubModule<WeatherData, null> {
           feelsLike: current.apparent_temperature,
           wind: current.wind_speed_10m,
           label: label(current.weather_code),
+          sky: sky(current.weather_code),
         },
         days: daily.time.map((date, i) => ({
           date,
           weekday: weekday.format(new Date(`${date}T12:00:00Z`)),
           label: label(daily.weather_code[i]),
+          sky: sky(daily.weather_code[i]),
           high: daily.temperature_2m_max[i],
           low: daily.temperature_2m_min[i],
           // Where this day's range sits on a bar covering the whole week.
